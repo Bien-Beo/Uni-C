@@ -29,12 +29,13 @@ struct product
     struct employee producter;
 };
 
-void addNewEmployee();
+void addNewEmployee(employee *employee);
 
 void addNewProduct(product *&productList, int &num_of_product);
-void addNewProductList();
-void displayProductList();
-void editProductByName();
+void addNewProductList(product *&productList, int &num_of_product);
+void displayProductList(const product *productList, int num_of_product);
+void editProductByName(product *productList, int num_of_product);
+
 void deleteProductByID();
 void searchProductByProducter();
 void sortProductsByPrice();
@@ -95,4 +96,31 @@ void addNewProduct(product *&productList, int &num_of_product)
     free(productList);
 
     productList = arr_resizable;
+}
+
+void addNewProductList(product *&productList, int &num_of_product)
+{
+    unsigned int quantity; scanf("%d", &quantity);
+    int newSize = num_of_product + quantity;
+    for(int i = num_of_product - 1; i < newSize - 1; i++)
+        addNewProduct(productList, num_of_product);
+}
+
+void displayProductList(const product *productList, int num_of_product)
+{
+
+}
+
+void editProductByName(product *productList, int num_of_product)
+{
+    char alternative_product_name[100];
+    fgets(alternative_product_name, sizeof(alternative_product_name) + 1, stdin);
+
+    for(int i = 0; i < 100; i++)
+    {
+        if(alternative_product_name[i] != productList->product_name[i])
+        {
+
+        }
+    }
 }
