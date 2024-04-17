@@ -29,14 +29,14 @@ struct product
     struct employee producter;
 };
 
-void addNewEmployee(employee *employee);
+void addEmployeeInformation(employee *employee);
 
 void addNewProduct(product *&productList, int &num_of_product);
 void addNewProductList(product *&productList, int &num_of_product);
 void displayProductList(const product *productList, int num_of_product);
 void editProductByName(product *productList, int num_of_product);
+void deleteProductByID(product *productList, int *num_of_product);
 
-void deleteProductByID();
 void searchProductByProducter();
 void sortProductsByPrice();
 void saveProductList();
@@ -48,7 +48,7 @@ int main()
     unsigned int ordinal;
 }
 
-void addNewEmployee(employee *employee)
+void addEmployeeInformation(employee *employee)
 {
     printf("\nEnter ID of the Employee: "); 
     scanf("%d", &employee->employee_id); getchar();
@@ -84,7 +84,7 @@ void addNewProduct(product *&productList, int &num_of_product)
     scanf("%d%d%d", &new_product.product_time.day, &new_product.product_time.month, &new_product.product_time.year); 
 
     printf("\nEnter the Producter: ");
-    employee new_employee; addNewEmployee(&new_employee); new_product.producter = new_employee;
+    employee new_employee; addEmployeeInformation(&new_employee); new_product.producter = new_employee;
 
     num_of_product++;
     product *arr_resizable = (product*)malloc(num_of_product * sizeof(product));
@@ -150,4 +150,15 @@ void editProductByName(product *productList, int num_of_product)
 
         *(productList + index_alternative_product) = alternative_product;
     }
+}
+
+void deleteProductByID(product *productList, int *num_of_product)
+{
+    unsigned int ID_location_of_product_deleted;
+    scanf("%d", &ID_location_of_product_deleted);
+
+    for(int index_product = ID_location_of_product_deleted - 1; index_product < num_of_product - 2; index_product++)
+        *(productList + ID_location_of_product_deleted) = *(productList + ID_location_of_product_deleted + 1);
+
+    num_of_product--;
 }
