@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+const int MAX_SIZE = 100;
+
 struct product_time
 {
     unsigned int day;
@@ -15,15 +17,14 @@ struct employee
     char employee_name[50];
     unsigned short employee_age;
     char employee_gender[10];
-    char employee_address[100];
+    char employee_address[MAX_SIZE];
     unsigned short employee_phoneNumber[10] = {0};
-    unsigned int employee_contribute = 0;
 };
 
 struct product
 {
     unsigned int product_id;
-    char product_name[100];
+    char product_name[MAX_SIZE];
     unsigned int product_price;
     struct product_time product_time;
     struct employee producter;
@@ -36,8 +37,8 @@ void addNewProductList(product *&productList, int &num_of_product);
 void displayProductList(const product *productList, int num_of_product);
 void editProductByName(product *productList, int num_of_product);
 void deleteProductByID(product *productList, int *num_of_product);
+void findMostContributingID(product *productList, int num_of_product);
 
-void searchProductByProducter();
 void sortProductsByPrice();
 void saveProductList();
 
@@ -118,9 +119,9 @@ void editProductByName(product *productList, int num_of_product)
     char alternative_product_name[100];
     fgets(alternative_product_name, sizeof(alternative_product_name) + 1, stdin);
 
-    for(int index_product = 0; index_product < num_of_product; index_product++)
+    for(int index_product = 0; index_product < num_of_product - 2; index_product++)
     {
-        for(int index_name_element = 0; index_name_element < 100; index_name_element++)
+        for(int index_name_element = 0; index_name_element < MAX_SIZE; index_name_element++)
         {
             if(alternative_product_name[index_name_element] != *(productList + index_product)->product_name[index_name_element])
                 break;
@@ -161,4 +162,61 @@ void deleteProductByID(product *productList, int *num_of_product)
         *(productList + ID_location_of_product_deleted) = *(productList + ID_location_of_product_deleted + 1);
 
     num_of_product--;
+}
+
+void findMostContributingID(product *productList, int num_of_product)
+{
+    unsigned int arr_employee_id[num_of_product - 1];
+
+    for(int index_product = 0; index_product < num_of_product - 2; index_product++)
+        arr_employee_id[index_product] = *(productList + index_product)->producter.employee_id;
+
+
+}
+
+int countFrequency(int arr[], int size)
+{
+    unsigned int arr_frequency[MAX_SIZE];
+    int unique_elements[MAX_SIZE] = {0};
+    int unique_count = 0;
+
+    for (int i = 0; i < size; i++) {
+        bool isNewElement = true;
+
+        for (int j = 0; j < unique_count; j++) {
+            if (arr[i] == unique_elements[j]) {
+                isNewElement = false;
+                break;
+            }
+        }
+
+        if (isNewElement) {
+            unique_elements[unique_count] = arr[i];
+            unique_count++;
+        }
+    }
+
+    for (int i = 0; i < unique_count; i++) {
+        int count = 0;
+
+        for (int j = 0; j < size; j++) {
+            if (arr[j] == unique_elements[i]) {
+                count++;
+            }
+        } 
+        arr_frequency[i] = count;   
+    }
+
+    int element_max = arr_frequency[0];
+    int contribute;
+    for(int k = 1; k < unique_count; k++)
+    {
+        if(element_max < arr_frequencyk)
+        {
+            element_max = arr_frequency[k];
+            contribute = k;
+        }
+    }
+
+    return unique_elements[contribute];
 }
