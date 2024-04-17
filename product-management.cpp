@@ -113,14 +113,41 @@ void displayProductList(const product *productList, int num_of_product)
 
 void editProductByName(product *productList, int num_of_product)
 {
+    bool marker = false;
+    unsigned int index_alternative_product;
     char alternative_product_name[100];
     fgets(alternative_product_name, sizeof(alternative_product_name) + 1, stdin);
 
-    for(int i = 0; i < 100; i++)
+    for(int index_product = 0; index_product < num_of_product; index_product++)
     {
-        if(alternative_product_name[i] != productList->product_name[i])
+        for(int index_name_element = 0; index_name_element < 100; index_name_element++)
         {
-
+            if(alternative_product_name[index_name_element] != *(productList + index_product)->product_name[index_name_element])
+                break;
+            else
+            {
+                marker = true;
+                index_alternative_product = index_product;
+            }
         }
+    }
+
+    if(marker)
+    {
+        product alternative_product;
+
+        printf("\nEnter ID of the Product: "); 
+        scanf("%d", &alternative_product.product_id); getchar();
+
+        printf("\nEnter the name of the Product: "); 
+        fgets(alternative_product.product_name, sizeof(alternative_product.product_name) + 1, stdin);
+
+        printf("\nEnter the Product's manuafacturing date: ");
+        scanf("%d%d%d", &alternative_product.product_time.day, &alternative_product.product_time.month, &alternative_product.product_time.year); 
+
+        printf("\nEnter the Producter: ");
+        employee new_employee; addNewEmployee(&new_employee); alternative_product.producter = new_employee;
+
+        *(productList + index_alternative_product) = alternative_product;
     }
 }
