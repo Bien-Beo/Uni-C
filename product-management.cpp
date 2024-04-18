@@ -48,7 +48,7 @@ void printMenu();
 int main()
 {
     product *productList = (product*)malloc(INITIALIZED_SIZE * sizeof(product));
-    unsigned int num_of_product = 0;
+    int num_of_product = 0;
     unsigned int ordinal;
 
     while(1)
@@ -72,7 +72,7 @@ int main()
             break;
 
         case 4:
-            updateProductAfterDeletion("product_list.txt", productList, num_of_product);
+            editProductByName(productList, num_of_product);
             break;
 
         case 5:
