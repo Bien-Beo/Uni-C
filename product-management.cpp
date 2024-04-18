@@ -76,7 +76,7 @@ int main()
             break;
 
         case 5:
-            deleteProductByID(productList, num_of_product);
+            deleteProductByID(productList, &num_of_product);
             break;
 
         case 6:
@@ -194,7 +194,7 @@ void addNewProductList(product *&productList, int &num_of_product)
 
 void displayProductList(const product *productList, int num_of_product)
 {
-    for(int i = 0; i < num_of_product; i++)
+    for(int i = 0; i < num_of_product - 1; i++)
     {
         printf("%d, %d, %s, %d, %d/%d/%d, %s\n", i + 1, 
             *(productList + i)->product_id, 
@@ -236,7 +236,7 @@ void editProductByName(product *productList, int num_of_product)
     char alternative_product_name[MAX_SIZE];
     fgets(alternative_product_name, sizeof(alternative_product_name) + 1, stdin);
 
-    for(int index_product = 0; index_product < num_of_product; index_product++)
+    for(int index_product = 0; index_product < num_of_product - 1; index_product++)
     {
         for(int index_name_element = 0; index_name_element < MAX_SIZE; index_name_element++)
         {
@@ -270,15 +270,15 @@ void editProductByName(product *productList, int num_of_product)
     }
 }
 
-void deleteProductByID(product *productList, int &num_of_product)
+void deleteProductByID(product *productList, int *num_of_product)
 {
     unsigned int ID_location_of_product_deleted;
     scanf("%d", &ID_location_of_product_deleted);
 
     for(int index_product = ID_location_of_product_deleted - 1; index_product < num_of_product; index_product++)
-        *(productList + index_product) = *(productList + index_product + 1);
+        *(productList + index_product) = *(productList + (index_product + 1));
 
-    num_of_product--;
+    *num_of_product--;
 }
 
 void findMostContributingID(product *productList, int num_of_product)
