@@ -33,9 +33,11 @@ struct product
 void addEmployeeInformation(employee *employee);
 
 void addNewProduct(product *&productList, int &num_of_product);
-void addNewProductList(product *&productList, int &num_of_product);
+void addNewProductList(product *&productList, int &num_of_product, const char* filename);
 void displayProductList(const product *productList, int num_of_product);
 void readProductListFromFile(const char *filename, struct Product productList[], int *num_of_product)
+
+void addProductToFile(const char* filename, product *productList, int &num_of_product);
 
 void editProductByName(product *productList, int num_of_product);
 void deleteProductByID(product *productList, int *num_of_product);
@@ -100,12 +102,35 @@ void addNewProduct(product *&productList, int &num_of_product)
     productList = arr_resizable;
 }
 
-void addNewProductList(product *&productList, int &num_of_product)
+void addProductToFile(const char* filename, product *productList, int &num_of_product)
+{
+    FILE* outputFile = fopen(filename, "a");
+    if (outputFile == NULL) 
+    {
+        printf("Không thể mở tệp.\n");
+        return;
+    }
+
+    addNewProduct(productList, num_of_product);
+
+    fprintf(outputFile, "%d, %s, %d, %d, %d, %d, %s\n", 
+        productList->product_id, 
+        productList->product_name,
+        productList->product_price, 
+        productList->product_time.day, 
+        productList->product_time.month, 
+        productList->product_time.year, 
+        productList->producter.employee_name);
+
+    fclose(outputFile);
+}
+
+void addNewProductList(product *&productList, int &num_of_product, const char* filename)
 {
     unsigned int quantity; scanf("%d", &quantity);
     int newSize = num_of_product + quantity;
     for(int i = num_of_product - 1; i < newSize - 1; i++)
-        addNewProduct(productList, num_of_product);
+        addNewProductList(productList, filename);
 }
 
 void displayProductList(const product *productList, int num_of_product)
@@ -123,9 +148,10 @@ void displayProductList(const product *productList, int num_of_product)
 
 void readProductListFromFile(const char *filename, struct Product productList[], int *num_of_product)
 {
-    FILE *inputFile = fopen(filename, "r"); // Mở tệp tin để đọc dữ liệu
+    FILE *inputFile = fopen(filename, "r");
 
-    if (inputFile != NULL) {
+    if (inputFile != NULL) 
+    {
         while (fscanf(inputFile, "%d, %[^,], %d, %d, %d, %d, %[^,]\n", 
         &productList[*numProducts].product_id, 
         productList[*numProducts].product_name,
@@ -135,10 +161,10 @@ void readProductListFromFile(const char *filename, struct Product productList[],
         &productList[*numProducts].product_time.year, 
         productList[*numProducts].producter.employee_name) == 7) 
         {
-            (*numProducts)++;
+            (*num_of_product)++;
         }
 
-        fclose(inputFile); // Đóng tệp tin sau khi đọc xong
+        fclose(inputFile);
     } 
     else
         fprintf(stderr, "Failed to open the input file.\n");
@@ -185,15 +211,37 @@ void editProductByName(product *productList, int num_of_product)
     }
 }
 
-void deleteProductByID(product *productList, int *num_of_product)
+void deleteProductByID(product *productList, int &num_of_product)
 {
     unsigned int ID_location_of_product_deleted;
     scanf("%d", &ID_location_of_product_deleted);
 
     for(int index_product = ID_location_of_product_deleted - 1; index_product < num_of_product - 2; index_product++)
-        *(productList + ID_location_of_product_deleted) = *(productList + ID_location_of_product_deleted + 1);
+        *(productList + index_product) = *(productList + index_product + 1);
 
     num_of_product--;
+}
+
+void updateFile(const char* filename, const Product *productList, int num_of_product)
+{
+    FILE *file = fopen(filename, "w");
+
+    if (inputFile != NULL) 
+    {
+        for(int i = 0; i < num_of_product - 2; i++)
+            fprintf(outputFile, "%d, %s, %d, %d, %d, %d, %s\n", 
+            productList->product_id, 
+            productList->product_name,
+            productList->product_price, 
+            productList->product_time.day, 
+            productList->product_time.month, 
+            productList->product_time.year, 
+            productList->producter.employee_name);
+
+        fclose(file);
+    }
+    else
+        fprintf(stderr, "Failed to open the input file.\n");
 }
 
 void findMostContributingID(product *productList, int num_of_product)
