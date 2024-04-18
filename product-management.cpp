@@ -2,30 +2,30 @@
 #include <stdlib.h>
 #include <string.h>
 
-const unsigned short int MAX_SIZE = 100;
-const unsigned short int INITIALIZED_SIZE = 1;
+#define MAX_PRODUCT 100
+#define INITIALIZED_SIZE 1
 
 struct product_time
 {
-    unsigned short int day;
-    unsigned short int month;
-    unsigned short int year;
+    int day;
+    int month;
+    int year;
 };
 
 struct employee
 {
-    unsigned int employee_id;
+    int employee_id;
     char employee_name[50];
-    unsigned short employee_age;
+    int employee_age;
     char employee_gender[10];
-    char employee_address[MAX_SIZE];
-    unsigned short int employee_phoneNumber[10] = {0};
+    char employee_address[MAX_PRODUCT];
+    int employee_phoneNumber[10] = {0};
 };
 
 struct product
 {
-    unsigned int product_id;
-    char product_name[MAX_SIZE];
+    int product_id;
+    char product_name[MAX_PRODUCT];
     double product_price;
     struct product_time product_time;
     struct employee producter;
@@ -36,10 +36,11 @@ void addEmployeeInformation(employee *employee);
 void addNewProduct(product *&productList, int &num_of_product);
 void addNewProductList(product *&productList, int &num_of_product);
 void displayProductList(const product *productList, int num_of_product);
-void readProductListFromFile(const char *filename, struct Product productList[], int *num_of_product);
+int readProductListFromFile(const char *filename, struct Product *system_product_list, int maxProducts);
 void addProductToFile(const char* filename, product *productList, int &num_of_product);
 void editProductByName(product *productList, int num_of_product);
 void deleteProductByID(product *productList, int *num_of_product);
+void countFrequency(int arr[], unsigned int size);
 void findMostContributingID(product *productList, int num_of_product);
 void sortProductsByPrice(product *productList, int num_of_product);
 void saveProductList(const product *productList, int num_of_product);
@@ -49,7 +50,7 @@ int main()
 {
     product *productList = (product*)malloc(INITIALIZED_SIZE * sizeof(product));
     int num_of_product = 0;
-    unsigned int ordinal;
+    int ordinal;
 
     while(1)
     {
@@ -92,8 +93,11 @@ int main()
             break;
 
         case 9:
-            readProductListFromFile("product_list.txt", productList, num_of_product);
-            displayProductList(productList, num_of_product);
+            {
+                product system_product_list[MAX_PRODUCT];
+                //int num_products_system = readProductListFromFile("product_list.txt", system_product_list, MAX_PRODUCT);
+                //displayProductList(system_product_list, num_products_system);
+            }
             break;
 
         case 10:
@@ -196,57 +200,61 @@ void displayProductList(const product *productList, int num_of_product)
 {
     for(int i = 0; i < num_of_product - 1; i++)
     {
-        printf("%d, %d, %s, %d, %d/%d/%d, %s\n", i + 1, 
-            *(productList + i)->product_id, 
-            *(productList + i)->product_name, 
-            *(productList + i)->product_price, 
-            *(productList + i)->product_time.day, *(productList + i)->product_time.month, *(productList + i)->product_time.year, 
-            *(productList + i)->producter.employee_name);
+        printf("%d, %d, %s, %lf, %d/%d/%d, %s\n", 
+			i + 1, 
+            (productList + i)->product_id, 
+            (productList + i)->product_name, 
+            (productList + i)->product_price, 
+            (productList + i)->product_time.day, (productList + i)->product_time.month, (productList + i)->product_time.year, 
+            (productList + i)->producter.employee_name);
     }
 }
 
-void readProductListFromFile(const char *filename, struct Product productList[], int *num_of_product)
+int readProductListFromFile(const char *filename, product *system_product_list, int maxProducts)
 {
     FILE *inputFile = fopen(filename, "r");
 
-    if (inputFile != NULL) 
+    if (inputFile == NULL) 
     {
-        while (fscanf(inputFile, "%d, %[^,], %d, %d, %d, %d, %[^,]\n", 
-        &productList[*numProducts].product_id, 
-        productList[*numProducts].product_name,
-        &productList[*numProducts].product_price, 
-        &productList[*numProducts].product_time.day, 
-        &productList[*numProducts].product_time.month, 
-        &productList[*numProducts].product_time.year, 
-        productList[*numProducts].producter.employee_name) == 7) 
-        {
-            (*num_of_product)++;
-        }
+        printf("Could not open file.\n");
+        return 0;
+    }
 
-        fclose(inputFile);
-    } 
-    else
-        fprintf(stderr, "Failed to open the input file.\n");
+    int num_products_system = 0;
+
+    while (fscanf(inputFile, "%d, %[^,], %d, %d, %d, %d, %[^,]\n", 
+    &system_product_list[num_products_system].product_id, 
+    system_product_list[num_products_system].product_name,
+    &system_product_list[num_products_system].product_price, 
+    &system_product_list[num_products_system].product_time.day, 
+    &system_product_list[num_products_system].product_time.month, 
+    &system_product_list[num_products_system].product_time.year, 
+    system_product_list[num_products_system].producter.employee_name) == 7) 
+    {
+        num_products_system++;
+        if (num_products_system >= maxProducts) break;
+    }
+
+    fclose(inputFile);
+    return num_products_system;
 }
 
 void editProductByName(product *productList, int num_of_product)
 {
     bool marker = false;
-    unsigned int index_alternative_product;
-    char alternative_product_name[MAX_SIZE];
+    int index_alternative_product;
+    char alternative_product_name[MAX_PRODUCT];
     fgets(alternative_product_name, sizeof(alternative_product_name) + 1, stdin);
 
     for(int index_product = 0; index_product < num_of_product - 1; index_product++)
     {
-        for(int index_name_element = 0; index_name_element < MAX_SIZE; index_name_element++)
+        int result = strcmp(alternative_product_name, (productList[index_product].product_name));
+        if(result != 0)
+            break;
+        else
         {
-            if(alternative_product_name[index_name_element] != *(productList + index_product)->product_name[index_name_element])
-                break;
-            else
-            {
-                marker = true;
-                index_alternative_product = index_product;
-            }
+            marker = true;
+            index_alternative_product = index_product;
         }
     }
 
@@ -264,7 +272,7 @@ void editProductByName(product *productList, int num_of_product)
         scanf("%d%d%d", &alternative_product.product_time.day, &alternative_product.product_time.month, &alternative_product.product_time.year); 
 
         printf("\nEnter the Producter: ");
-        employee new_employee; addNewEmployee(&new_employee); alternative_product.producter = new_employee;
+        employee new_employee; addEmployeeInformation(&new_employee); alternative_product.producter = new_employee;
 
         *(productList + index_alternative_product) = alternative_product;
     }
@@ -275,36 +283,25 @@ void deleteProductByID(product *productList, int *num_of_product)
     unsigned int ID_location_of_product_deleted;
     scanf("%d", &ID_location_of_product_deleted);
 
-    for(int index_product = ID_location_of_product_deleted - 1; index_product < num_of_product; index_product++)
+    for(int index_product = ID_location_of_product_deleted - 1; index_product < *num_of_product; index_product++)
         *(productList + index_product) = *(productList + (index_product + 1));
 
     *num_of_product--;
 }
 
-void findMostContributingID(product *productList, int num_of_product)
+void countFrequency(int arr_emloyee_id[], int num_of_emoloyee_id)
 {
-    unsigned int num_of_emoloyee_id = num_of_product;
-    unsigned int arr_employee_id[num_of_emoloyee_id];
+    int arr_frequency[MAX_PRODUCT];
+    int unique_elements[MAX_PRODUCT] = {0};
+    int unique_count = 0;
 
-    for(int index_product = 0; index_product < num_of_product; index_product++)
-        arr_employee_id[index_product] = *(productList + index_product)->producter.employee_id;
-
-    countFrequency(arr_emloyee_id, num_of_emoloyee_id);
-}
-
-void countFrequency(unsigned int arr[], unsigned int size)
-{
-    unsigned int arr_frequency[MAX_SIZE];
-    unsigned int unique_elements[MAX_SIZE] = {0};
-    unsigned int unique_count = 0;
-
-    for (int i = 0; i < size; i++) 
+    for (int i = 0; i < num_of_emoloyee_id; i++) 
     {
         bool is_new_element = true;
 
         for (int j = 0; j < unique_count; j++) 
         {
-            if (arr[i] == unique_elements[j]) 
+            if (arr_emloyee_id[i] == unique_elements[j]) 
             {
                 is_new_element = false;
                 break;
@@ -313,7 +310,7 @@ void countFrequency(unsigned int arr[], unsigned int size)
 
         if (is_new_element) 
         {
-            unique_elements[unique_count] = arr[i];
+            unique_elements[unique_count] = arr_emloyee_id[i];
             unique_count++;
         }
     }
@@ -322,15 +319,74 @@ void countFrequency(unsigned int arr[], unsigned int size)
     {
         int count_frequency = 0;
 
-        for (int j = 0; j < size; j++) 
-            if (arr[j] == unique_elements[i]) 
+        for (int j = 0; j < num_of_emoloyee_id; j++) 
+            if (arr_emloyee_id[j] == unique_elements[i]) 
                 count_frequency++;
                 
         arr_frequency[i] = count_frequency;   
     }
 
-    unsigned int largest_frequency = arr_frequency[0];
-    unsigned int contribute_value = 0;
+    int largest_frequency = arr_frequency[0];
+    int contribute_value = 0;
+    for(int i = 1; i < unique_count; i++)
+    {
+        if(largest_frequency < arr_frequency[i])
+        {
+            largest_frequency = arr_frequency[i];
+            contribute_value = i;
+        }
+    }
+
+    printf("ID of the employee who contributed the most based on the number of products produced: %d", unique_elements[contribute_value]);
+    printf("The contribution amount of ID %d = %d", unique_elements[contribute_value], largest_frequency);
+}
+
+void findMostContributingID(product *productList, int num_of_product)
+{
+    int num_of_emoloyee_id = num_of_product;
+    int arr_employee_id[num_of_emoloyee_id];
+
+    for(int index_product = 0; index_product < num_of_product; index_product++)
+        arr_employee_id[index_product] = productList[index_product].producter.employee_id;
+
+    //countFrequency(arr_emloyee_id, num_of_emoloyee_id);
+    int arr_frequency[MAX_PRODUCT];
+    int unique_elements[MAX_PRODUCT] = {0};
+    int unique_count = 0;
+
+    for (int i = 0; i < num_of_emoloyee_id; i++) 
+    {
+        bool is_new_element = true;
+
+        for (int j = 0; j < unique_count; j++) 
+        {
+            if (arr_employee_id[i] == unique_elements[j]) 
+            {
+                is_new_element = false;
+                break;
+            }
+        }
+
+        if (is_new_element) 
+        {
+            unique_elements[unique_count] = arr_employee_id[i];
+            unique_count++;
+        }
+    }
+
+    for (int i = 0; i < unique_count; i++) 
+    {
+        int count_frequency = 0;
+
+        for (int j = 0; j < num_of_emoloyee_id; j++) 
+            if (arr_employee_id[j] == unique_elements[i]) 
+                count_frequency++;
+                
+        arr_frequency[i] = count_frequency;   
+    }
+
+    int largest_frequency = arr_frequency[0];
+    int contribute_value = 0;
     for(int i = 1; i < unique_count; i++)
     {
         if(largest_frequency < arr_frequency[i])
