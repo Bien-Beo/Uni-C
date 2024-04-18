@@ -38,8 +38,8 @@ void displayProductList(const product *productList, int num_of_product);
 void editProductByName(product *productList, int num_of_product);
 void deleteProductByID(product *productList, int *num_of_product);
 void findMostContributingID(product *productList, int num_of_product);
+void sortProductsByPrice(product *productList, int num_of_product);
 
-void sortProductsByPrice();
 void saveProductList();
 
 int main()
@@ -225,4 +225,20 @@ void countFrequency(unsigned int arr[], unsigned int size)
 
     printf("ID of the employee who contributed the most based on the number of products produced: %d", unique_elements[contribute_value]);
     printf("The contribution amount of ID %d = %d", unique_elements[contribute_value], largest_frequency);
+}
+
+void sortProductsByPrice(product *productList, int num_of_product)
+{
+    for(int i = 0; i < num_of_product - 3; i++)
+    {
+        for(int j = i + 1; j < num_of_product - 2; j++)
+        {
+            if(*(productList + i)->product_price > *(productList + j)->product_price)
+            {
+                product temp_product = *(productList + i);
+                *(productList + i) = *(productList + j);
+                *(productList + j) = temp_product;
+            }
+        }
+    }
 }
