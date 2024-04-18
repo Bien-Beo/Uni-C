@@ -174,49 +174,54 @@ void findMostContributingID(product *productList, int num_of_product)
 
 }
 
-int countFrequency(int arr[], int size)
+void countFrequency(unsigned int arr[], unsigned int size)
 {
     unsigned int arr_frequency[MAX_SIZE];
-    int unique_elements[MAX_SIZE] = {0};
-    int unique_count = 0;
+    unsigned int unique_elements[MAX_SIZE] = {0};
+    unsigned int unique_count = 0;
 
-    for (int i = 0; i < size; i++) {
-        bool isNewElement = true;
+    for (int i = 0; i < size; i++) 
+    {
+        bool is_new_element = true;
 
-        for (int j = 0; j < unique_count; j++) {
-            if (arr[i] == unique_elements[j]) {
-                isNewElement = false;
+        for (int j = 0; j < unique_count; j++) 
+        {
+            if (arr[i] == unique_elements[j]) 
+            {
+                is_new_element = false;
                 break;
             }
         }
 
-        if (isNewElement) {
+        if (is_new_element) 
+        {
             unique_elements[unique_count] = arr[i];
             unique_count++;
         }
     }
 
-    for (int i = 0; i < unique_count; i++) {
-        int count = 0;
+    for (int i = 0; i < unique_count; i++) 
+    {
+        int count_frequency = 0;
 
-        for (int j = 0; j < size; j++) {
-            if (arr[j] == unique_elements[i]) {
-                count++;
-            }
-        } 
-        arr_frequency[i] = count;   
+        for (int j = 0; j < size; j++) 
+            if (arr[j] == unique_elements[i]) 
+                count_frequency++;
+                
+        arr_frequency[i] = count_frequency;   
     }
 
-    int element_max = arr_frequency[0];
-    int contribute;
-    for(int k = 1; k < unique_count; k++)
+    unsigned int largest_frequency = arr_frequency[0];
+    unsigned int contribute_value = 0;
+    for(int i = 1; i < unique_count; i++)
     {
-        if(element_max < arr_frequencyk)
+        if(largest_frequency < arr_frequency[i])
         {
-            element_max = arr_frequency[k];
-            contribute = k;
+            largest_frequency = arr_frequency[i];
+            contribute_value = i;
         }
     }
 
-    return unique_elements[contribute];
+    printf("ID of the employee who contributed the most based on the number of products produced: %d", unique_elements[contribute_value]);
+    printf("The contribution amount of ID %d = %d", unique_elements[contribute_value], largest_frequency);
 }
