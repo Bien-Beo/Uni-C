@@ -35,6 +35,8 @@ void addEmployeeInformation(employee *employee);
 void addNewProduct(product *&productList, int &num_of_product);
 void addNewProductList(product *&productList, int &num_of_product);
 void displayProductList(const product *productList, int num_of_product);
+void readProductListFromFile(const char *filename, struct Product productList[], int *num_of_product)
+
 void editProductByName(product *productList, int num_of_product);
 void deleteProductByID(product *productList, int *num_of_product);
 void findMostContributingID(product *productList, int num_of_product);
@@ -108,7 +110,38 @@ void addNewProductList(product *&productList, int &num_of_product)
 
 void displayProductList(const product *productList, int num_of_product)
 {
+    for(int i = 0; i < num_of_product - 2; i++)
+    {
+        printf("%d, %d, %s, %d, %d/%d/%d, %s\n", i + 1, 
+            *(productList + i)->product_id, 
+            *(productList + i)->product_name, 
+            *(productList + i)->product_price, 
+            *(productList + i)->product_time.day, *(productList + i)->product_time.month, *(productList + i)->product_time.year, 
+            *(productList + i)->producter.employee_name);
+    }
+}
 
+void readProductListFromFile(const char *filename, struct Product productList[], int *num_of_product)
+{
+    FILE *inputFile = fopen(filename, "r"); // Mở tệp tin để đọc dữ liệu
+
+    if (inputFile != NULL) {
+        while (fscanf(inputFile, "%d, %[^,], %d, %d, %d, %d, %[^,]\n", 
+        &productList[*numProducts].product_id, 
+        productList[*numProducts].product_name,
+        &productList[*numProducts].product_price, 
+        &productList[*numProducts].product_time.day, 
+        &productList[*numProducts].product_time.month, 
+        &productList[*numProducts].product_time.year, 
+        productList[*numProducts].producter.employee_name) == 7) 
+        {
+            (*numProducts)++;
+        }
+
+        fclose(inputFile); // Đóng tệp tin sau khi đọc xong
+    } 
+    else
+        fprintf(stderr, "Failed to open the input file.\n");
 }
 
 void editProductByName(product *productList, int num_of_product)
@@ -263,3 +296,4 @@ void saveProductList(const product *productList, int num_of_product)
     else
         fprintf(stderr, "Failed to open the output file.\n");
 }
+
