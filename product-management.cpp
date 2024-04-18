@@ -39,8 +39,7 @@ void editProductByName(product *productList, int num_of_product);
 void deleteProductByID(product *productList, int *num_of_product);
 void findMostContributingID(product *productList, int num_of_product);
 void sortProductsByPrice(product *productList, int num_of_product);
-
-void saveProductList();
+void saveProductList(const product *productList, int num_of_product);
 
 int main()
 {
@@ -241,4 +240,26 @@ void sortProductsByPrice(product *productList, int num_of_product)
             }
         }
     }
+}
+
+void saveProductList(const product *productList, int num_of_product)
+{
+    FILE *output_file = fopen("product_list.txt", "w");
+
+    if(output_file != NULL)
+    {
+        for(int i = 0; i < num_of_product - 2; i++)
+        {
+            fprintf(output_file, "%d, %d, %s, %d, %d/%d/%d, %s\n", i + 1, 
+            *(productList + i)->product_id, 
+            *(productList + i)->product_name, 
+            *(productList + i)->product_price, 
+            *(productList + i)->product_time.day, *(productList + i)->product_time.month, *(productList + i)->product_time.year, 
+            *(productList + i)->producter.employee_name);
+        }
+        printf("Product list saved successfully.\n");
+        fclose(output_file);
+    }
+    else
+        fprintf(stderr, "Failed to open the output file.\n");
 }
