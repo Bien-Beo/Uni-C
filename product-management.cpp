@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 
 #define MAX_PRODUCT 100
 #define INITIALIZED_SIZE 1
@@ -40,7 +41,6 @@ int readProductListFromFile(const char *filename, struct Product *system_product
 void addProductToFile(const char* filename, product *productList, int &num_of_product);
 void editProductByName(product *productList, int num_of_product);
 void deleteProductByID(product *productList, int *num_of_product);
-void countFrequency(int arr[], unsigned int size);
 void findMostContributingID(product *productList, int num_of_product);
 void sortProductsByPrice(product *productList, int num_of_product);
 void saveProductList(const product *productList, int num_of_product);
@@ -55,8 +55,8 @@ int main()
     while(1)
     {
         printMenu();
-        unsigned short int choose;
-        printf("Please enter your choice: "); scanf("%d", &choose);
+        int choose;
+        printf("\nPlease enter your choice: "); scanf("%d", &choose);
 
         switch (choose)
         {
@@ -124,7 +124,7 @@ void addEmployeeInformation(employee *employee)
     fgets(employee->employee_name, sizeof(employee->employee_name) + 1, stdin);
 
     printf("\nEnter the age of the Employee: ");
-    scanf("%d", &employee->employee_age);
+    scanf("%d", &employee->employee_age); getchar();
 
     printf("\nEnter the gender of the Employee: ");
     fgets(employee->employee_gender, sizeof(employee->employee_gender) + 1, stdin);
@@ -140,10 +140,12 @@ void addEmployeeInformation(employee *employee)
 void addNewProduct(product *&productList, int &num_of_product)
 {
     num_of_product++;
-    product *arr_resizable = (product*)malloc(num_of_product * sizeof(product));
+    product *arr_resizable = (product*)malloc(INITIALIZED_SIZE * sizeof(product));
 
-    for(int i = 0; i < num_of_product; i++)
+    for(int i = 0; i < num_of_product - 1; i++)
         arr_resizable[i] = productList[i];
+
+    //std::copy(productList, productList + num_of_product - 1, arr_resizable);
 
     free(productList);
     productList = arr_resizable;
@@ -198,15 +200,14 @@ void addNewProductList(product *&productList, int &num_of_product)
 
 void displayProductList(const product *productList, int num_of_product)
 {
-    for(int i = 0; i < num_of_product - 1; i++)
+    for(int i = 0; i < num_of_product; i++)
     {
-        printf("%d, %d, %s, %lf, %d/%d/%d, %s\n", 
-			i + 1, 
-            (productList + i)->product_id, 
-            (productList + i)->product_name, 
-            (productList + i)->product_price, 
-            (productList + i)->product_time.day, (productList + i)->product_time.month, (productList + i)->product_time.year, 
-            (productList + i)->producter.employee_name);
+        printf("%d, %s, %.2lf, %d/%d/%d, %s\n",
+            (*(productList + i)).product_id, 
+            (*(productList + i)).product_name, 
+            (*(productList + i)).product_price, 
+            (*(productList + i)).product_time.day, (*(productList + i)).product_time.month, (*(productList + i)).product_time.year, 
+            (*(productList + i)).producter.employee_name);
     }
 }
 
@@ -289,58 +290,6 @@ void deleteProductByID(product *productList, int *num_of_product)
     *num_of_product--;
 }
 
-void countFrequency(int arr_emloyee_id[], int num_of_emoloyee_id)
-{
-    int arr_frequency[MAX_PRODUCT];
-    int unique_elements[MAX_PRODUCT] = {0};
-    int unique_count = 0;
-
-    for (int i = 0; i < num_of_emoloyee_id; i++) 
-    {
-        bool is_new_element = true;
-
-        for (int j = 0; j < unique_count; j++) 
-        {
-            if (arr_emloyee_id[i] == unique_elements[j]) 
-            {
-                is_new_element = false;
-                break;
-            }
-        }
-
-        if (is_new_element) 
-        {
-            unique_elements[unique_count] = arr_emloyee_id[i];
-            unique_count++;
-        }
-    }
-
-    for (int i = 0; i < unique_count; i++) 
-    {
-        int count_frequency = 0;
-
-        for (int j = 0; j < num_of_emoloyee_id; j++) 
-            if (arr_emloyee_id[j] == unique_elements[i]) 
-                count_frequency++;
-                
-        arr_frequency[i] = count_frequency;   
-    }
-
-    int largest_frequency = arr_frequency[0];
-    int contribute_value = 0;
-    for(int i = 1; i < unique_count; i++)
-    {
-        if(largest_frequency < arr_frequency[i])
-        {
-            largest_frequency = arr_frequency[i];
-            contribute_value = i;
-        }
-    }
-
-    printf("ID of the employee who contributed the most based on the number of products produced: %d", unique_elements[contribute_value]);
-    printf("The contribution amount of ID %d = %d", unique_elements[contribute_value], largest_frequency);
-}
-
 void findMostContributingID(product *productList, int num_of_product)
 {
     int num_of_emoloyee_id = num_of_product;
@@ -406,7 +355,7 @@ void sortProductsByPrice(product *productList, int num_of_product)
     {
         for(int j = i + 1; j < num_of_product; j++)
         {
-            if(*(productList + i)->product_price > *(productList + j)->product_price)
+            if((productList + i)->product_price > (productList + j)->product_price)
             {
                 product temp_product = *(productList + i);
                 *(productList + i) = *(productList + j);
@@ -424,12 +373,13 @@ void saveProductList(const product *productList, int num_of_product)
     {
         for(int i = 0; i < num_of_product - 2; i++)
         {
-            fprintf(output_file, "%d, %d, %s, %d, %d/%d/%d, %s\n", i + 1, 
-            *(productList + i)->product_id, 
-            *(productList + i)->product_name, 
-            *(productList + i)->product_price, 
-            *(productList + i)->product_time.day, *(productList + i)->product_time.month, *(productList + i)->product_time.year, 
-            *(productList + i)->producter.employee_name);
+            fprintf(output_file, "%d, %d, %s, %d, %d/%d/%d, %s\n", 
+			i + 1, 
+            (productList + i)->product_id, 
+            (productList + i)->product_name, 
+            (productList + i)->product_price, 
+            (productList + i)->product_time.day, (productList + i)->product_time.month, (productList + i)->product_time.year, 
+            (productList + i)->producter.employee_name);
         }
         printf("Product list saved successfully.\n");
         fclose(output_file);
@@ -447,27 +397,27 @@ void printMenu()
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   S No.  + FUNCTION                                                :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   1st    + Create a new product                                    :\n");
+    printf(":   1st    : Create a new product                                    :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   2nd    + Create a new product list                               :\n");
+    printf(":   2nd    : Create a new product list                               :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   3rd    + Displays a list of products                             :\n");
+    printf(":   3rd    : Displays a list of products                             :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   4th    + Update product information that needs fixing            :\n"); 
+    printf(":   4th    : Update product information that needs fixing            :\n"); 
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   5th    + Delete the product                                      :\n");
+    printf(":   5th    : Delete the product                                      :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   6th    + Find the ID of the employee with the most contributions :\n");
+    printf(":   6th    : Find the ID of the employee with the most contributions :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   7th    + Sort products by price                                  :\n");
+    printf(":   7th    : Sort products by price                                  :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   8th    + Save product list to the system                         :\n");
+    printf(":   8th    : Save product list to the system                         :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   9th    + Displays the list of available products on the system   :\n");
+    printf(":   9th    : Displays the list of available products on the system   :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   10st   + Create new products on the system (Quick feature)       :\n");
+    printf(":   10st   : Create new products on the system (Quick feature)       :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":    0     + Exit the program                                        :\n");
+    printf(":    0     : Exit the program                                        :\n");
     printf("+----------+---------------------------------------------------------+\n");
 
     printf("\n======================================================================");
