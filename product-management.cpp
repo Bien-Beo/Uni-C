@@ -2,13 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-const int MAX_SIZE = 100;
+const unsigned short int MAX_SIZE = 100;
+const unsigned short int INITIALIZED_SIZE = 1;
 
 struct product_time
 {
-    unsigned int day;
-    unsigned int month;
-    unsigned int year;
+    unsigned short int day;
+    unsigned short int month;
+    unsigned short int year;
 };
 
 struct employee
@@ -18,14 +19,14 @@ struct employee
     unsigned short employee_age;
     char employee_gender[10];
     char employee_address[MAX_SIZE];
-    unsigned short employee_phoneNumber[10] = {0};
+    unsigned short int employee_phoneNumber[10] = {0};
 };
 
 struct product
 {
     unsigned int product_id;
     char product_name[MAX_SIZE];
-    unsigned int product_price;
+    double product_price;
     struct product_time product_time;
     struct employee producter;
 };
@@ -33,23 +34,78 @@ struct product
 void addEmployeeInformation(employee *employee);
 
 void addNewProduct(product *&productList, int &num_of_product);
-void addNewProductList(product *&productList, int &num_of_product, const char* filename);
+void addNewProductList(product *&productList, int &num_of_product);
 void displayProductList(const product *productList, int num_of_product);
-void readProductListFromFile(const char *filename, struct Product productList[], int *num_of_product)
-
+void readProductListFromFile(const char *filename, struct Product productList[], int *num_of_product);
 void addProductToFile(const char* filename, product *productList, int &num_of_product);
-
 void editProductByName(product *productList, int num_of_product);
 void deleteProductByID(product *productList, int *num_of_product);
+void updateProductAfterDeletion(const char* filename, const Product *productList, int num_of_product);
 void findMostContributingID(product *productList, int num_of_product);
 void sortProductsByPrice(product *productList, int num_of_product);
 void saveProductList(const product *productList, int num_of_product);
+void printMenu();
 
 int main()
 {
-    unsigned int num_of_product = 1;
-    product *productList = (product*)malloc(num_of_product * sizeof(product));
+    product *productList = (product*)malloc(INITIALIZED_SIZE * sizeof(product));
+    unsigned int num_of_product = 0;
     unsigned int ordinal;
+
+    while(1)
+    {
+        printMenu();
+        unsigned short int choose;
+        printf("Please enter your choice: "); scanf("%d", &choose);
+
+        switch (choose)
+        {
+        case 1:
+            addNewProduct(productList, num_of_product);
+            break;
+
+        case 2:
+            addNewProductList(productList, num_of_product);
+            break;
+
+        case 3:
+            displayProductList(productList, num_of_product);
+            break;
+
+        case 4:
+            updateProductAfterDeletion("product_list.txt", productList, num_of_product);
+            break;
+
+        case 5:
+            deleteProductByID(productList, num_of_product);
+            break;
+
+        case 6:
+            findMostContributingID(productList, num_of_product);
+            break;
+
+        case 7:
+            sortProductsByPrice(productList, num_of_product);
+            break;
+
+        case 8:
+            saveProductList(productList, num_of_product);
+            break;
+
+        case 9:
+            readProductListFromFile("product_list.txt", productList, num_of_product);
+            displayProductList(productList, num_of_product);
+            break;
+
+        case 10:
+            free(productList);
+            return 0;
+
+        default:
+            free(productList);
+            return 0;
+        }
+    }
 }
 
 void addEmployeeInformation(employee *employee)
@@ -76,6 +132,15 @@ void addEmployeeInformation(employee *employee)
 
 void addNewProduct(product *&productList, int &num_of_product)
 {
+    num_of_product++;
+    product *arr_resizable = (product*)malloc(num_of_product * sizeof(product));
+
+    for(int i = 0; i < num_of_product; i++)
+        arr_resizable[i] = productList[i];
+
+    free(productList);
+    productList = arr_resizable;
+
     product new_product;
 
     printf("\nEnter ID of the Product: "); 
@@ -90,19 +155,10 @@ void addNewProduct(product *&productList, int &num_of_product)
     printf("\nEnter the Producter: ");
     employee new_employee; addEmployeeInformation(&new_employee); new_product.producter = new_employee;
 
-    num_of_product++;
-    product *arr_resizable = (product*)malloc(num_of_product * sizeof(product));
-
-    for(int i = 0; i < num_of_product - 1; i++)
-        arr_resizable[i] = productList[i];
-
     arr_resizable[num_of_product - 1] = new_product;
-    free(productList);
-
-    productList = arr_resizable;
 }
 
-void addProductToFile(const char* filename, product *productList, int &num_of_product)
+//void addProductToFile(const char* filename, product *productList, int &num_of_product)
 {
     FILE* outputFile = fopen(filename, "a");
     if (outputFile == NULL) 
@@ -125,17 +181,17 @@ void addProductToFile(const char* filename, product *productList, int &num_of_pr
     fclose(outputFile);
 }
 
-void addNewProductList(product *&productList, int &num_of_product, const char* filename)
+void addNewProductList(product *&productList, int &num_of_product)
 {
     unsigned int quantity; scanf("%d", &quantity);
     int newSize = num_of_product + quantity;
-    for(int i = num_of_product - 1; i < newSize - 1; i++)
-        addNewProductList(productList, filename);
+    for(int i = num_of_product; i < newSize; i++)
+        addNewProduct(productList, num_of_product);
 }
 
 void displayProductList(const product *productList, int num_of_product)
 {
-    for(int i = 0; i < num_of_product - 2; i++)
+    for(int i = 0; i < num_of_product; i++)
     {
         printf("%d, %d, %s, %d, %d/%d/%d, %s\n", i + 1, 
             *(productList + i)->product_id, 
@@ -146,7 +202,7 @@ void displayProductList(const product *productList, int num_of_product)
     }
 }
 
-void readProductListFromFile(const char *filename, struct Product productList[], int *num_of_product)
+//void readProductListFromFile(const char *filename, struct Product productList[], int *num_of_product)
 {
     FILE *inputFile = fopen(filename, "r");
 
@@ -174,10 +230,10 @@ void editProductByName(product *productList, int num_of_product)
 {
     bool marker = false;
     unsigned int index_alternative_product;
-    char alternative_product_name[100];
+    char alternative_product_name[MAX_SIZE];
     fgets(alternative_product_name, sizeof(alternative_product_name) + 1, stdin);
 
-    for(int index_product = 0; index_product < num_of_product - 2; index_product++)
+    for(int index_product = 0; index_product < num_of_product; index_product++)
     {
         for(int index_name_element = 0; index_name_element < MAX_SIZE; index_name_element++)
         {
@@ -216,13 +272,13 @@ void deleteProductByID(product *productList, int &num_of_product)
     unsigned int ID_location_of_product_deleted;
     scanf("%d", &ID_location_of_product_deleted);
 
-    for(int index_product = ID_location_of_product_deleted - 1; index_product < num_of_product - 2; index_product++)
+    for(int index_product = ID_location_of_product_deleted - 1; index_product < num_of_product; index_product++)
         *(productList + index_product) = *(productList + index_product + 1);
 
     num_of_product--;
 }
 
-void updateFile(const char* filename, const Product *productList, int num_of_product)
+//void updateProductAfterDeletion(const char* filename, const Product *productList, int num_of_product)
 {
     FILE *file = fopen(filename, "w");
 
@@ -246,10 +302,10 @@ void updateFile(const char* filename, const Product *productList, int num_of_pro
 
 void findMostContributingID(product *productList, int num_of_product)
 {
-    unsigned int num_of_emoloyee_id = num_of_product - 1;
+    unsigned int num_of_emoloyee_id = num_of_product;
     unsigned int arr_employee_id[num_of_emoloyee_id];
 
-    for(int index_product = 0; index_product < num_of_product - 2; index_product++)
+    for(int index_product = 0; index_product < num_of_product; index_product++)
         arr_employee_id[index_product] = *(productList + index_product)->producter.employee_id;
 
     countFrequency(arr_emloyee_id, num_of_emoloyee_id);
@@ -309,9 +365,9 @@ void countFrequency(unsigned int arr[], unsigned int size)
 
 void sortProductsByPrice(product *productList, int num_of_product)
 {
-    for(int i = 0; i < num_of_product - 3; i++)
+    for(int i = 0; i < num_of_product - 1; i++)
     {
-        for(int j = i + 1; j < num_of_product - 2; j++)
+        for(int j = i + 1; j < num_of_product; j++)
         {
             if(*(productList + i)->product_price > *(productList + j)->product_price)
             {
@@ -345,3 +401,35 @@ void saveProductList(const product *productList, int num_of_product)
         fprintf(stderr, "Failed to open the output file.\n");
 }
 
+void printMenu()
+{
+    printf("======================================================================\n");
+    printf("==================*** PRODUCT MANAGEMENT PROGRAM ***==================\n");
+    printf("======================================================================\n\n");
+
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":   S No.  + FUNCTION                                                :\n");
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":   1st    + Create a new product                                    :\n");
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":   2nd    + Create a new product list                               :\n");
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":   3rd    + Displays a list of products                             :\n");
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":   4th    + Update product information that needs fixing            :\n"); 
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":   5th    + Delete the product                                      :\n");
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":   6th    + Find the ID of the employee with the most contributions :\n");
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":   7th    + Sort products by price                                  :\n");
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":   8th    + Save product list to the system                         :\n");
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":   9th    + Displays the list of available products on the system   :\n");
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":   10th   + Exit the program                                        :\n");
+    printf("+----------+---------------------------------------------------------+\n");
+
+    printf("\n======================================================================");
+}
