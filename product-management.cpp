@@ -40,7 +40,6 @@ void readProductListFromFile(const char *filename, struct Product productList[],
 void addProductToFile(const char* filename, product *productList, int &num_of_product);
 void editProductByName(product *productList, int num_of_product);
 void deleteProductByID(product *productList, int *num_of_product);
-void updateProductAfterDeletion(const char* filename, const Product *productList, int num_of_product);
 void findMostContributingID(product *productList, int num_of_product);
 void sortProductsByPrice(product *productList, int num_of_product);
 void saveProductList(const product *productList, int num_of_product);
@@ -98,6 +97,10 @@ int main()
             break;
 
         case 10:
+            addProductToFile("product_list.txt", productList, num_of_product);
+            break;
+
+        case 0:
             free(productList);
             return 0;
 
@@ -158,7 +161,7 @@ void addNewProduct(product *&productList, int &num_of_product)
     arr_resizable[num_of_product - 1] = new_product;
 }
 
-//void addProductToFile(const char* filename, product *productList, int &num_of_product)
+void addProductToFile(const char* filename, product *productList, int &num_of_product)
 {
     FILE* outputFile = fopen(filename, "a");
     if (outputFile == NULL) 
@@ -202,7 +205,7 @@ void displayProductList(const product *productList, int num_of_product)
     }
 }
 
-//void readProductListFromFile(const char *filename, struct Product productList[], int *num_of_product)
+void readProductListFromFile(const char *filename, struct Product productList[], int *num_of_product)
 {
     FILE *inputFile = fopen(filename, "r");
 
@@ -276,28 +279,6 @@ void deleteProductByID(product *productList, int &num_of_product)
         *(productList + index_product) = *(productList + index_product + 1);
 
     num_of_product--;
-}
-
-//void updateProductAfterDeletion(const char* filename, const Product *productList, int num_of_product)
-{
-    FILE *file = fopen(filename, "w");
-
-    if (inputFile != NULL) 
-    {
-        for(int i = 0; i < num_of_product - 2; i++)
-            fprintf(outputFile, "%d, %s, %d, %d, %d, %d, %s\n", 
-            productList->product_id, 
-            productList->product_name,
-            productList->product_price, 
-            productList->product_time.day, 
-            productList->product_time.month, 
-            productList->product_time.year, 
-            productList->producter.employee_name);
-
-        fclose(file);
-    }
-    else
-        fprintf(stderr, "Failed to open the input file.\n");
 }
 
 void findMostContributingID(product *productList, int num_of_product)
@@ -428,7 +409,9 @@ void printMenu()
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   9th    + Displays the list of available products on the system   :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   10th   + Exit the program                                        :\n");
+    printf(":   10st   + Create new products on the system (Quick feature)       :\n");
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":    0     + Exit the program                                        :\n");
     printf("+----------+---------------------------------------------------------+\n");
 
     printf("\n======================================================================");
