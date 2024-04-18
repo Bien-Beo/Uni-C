@@ -166,12 +166,13 @@ void deleteProductByID(product *productList, int *num_of_product)
 
 void findMostContributingID(product *productList, int num_of_product)
 {
-    unsigned int arr_employee_id[num_of_product - 1];
+    unsigned int num_of_emoloyee_id = num_of_product - 1;
+    unsigned int arr_employee_id[num_of_emoloyee_id];
 
     for(int index_product = 0; index_product < num_of_product - 2; index_product++)
         arr_employee_id[index_product] = *(productList + index_product)->producter.employee_id;
 
-
+    countFrequency(arr_emloyee_id, num_of_emoloyee_id);
 }
 
 void countFrequency(unsigned int arr[], unsigned int size)
