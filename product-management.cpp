@@ -38,7 +38,7 @@ void displayProductList(const product *productList, int num_of_product);
 int readProductListFromFile(const char *filename, struct product *system_product_list, int maxProducts);
 void addProductToFile(const char* filename, product *productList, int &num_of_product);
 void editProductByName(product *productList, int num_of_product);
-void deleteProductByID(product *productList, int *num_of_product);
+void deleteProductByID(product *&productList, int &num_of_product);
 void findMostContributingID(product *productList, int num_of_product);
 void sortProductsByPrice(product *productList, int num_of_product);
 void saveProductList(const product *productList, int num_of_product);
@@ -83,7 +83,7 @@ int main()
             break;
 
         case 5:
-            deleteProductByID(productList, &num_of_product);
+            deleteProductByID(productList, num_of_product);
             break;
 
         case 6:
@@ -316,15 +316,23 @@ void editProductByName(product *productList, int num_of_product)
     }
 }
 
-void deleteProductByID(product *productList, int *num_of_product)
+void deleteProductByID(product *&productList, int &num_of_product)
 {
     int ID_location_of_product_deleted;
-    scanf("%d", &ID_location_of_product_deleted);
+    printf("\nEnter the ID of the product to delete: ");
+    scanf("%d", &ID_location_of_product_deleted); getchar();
 
-    for(int index_product = ID_location_of_product_deleted - 1; index_product < *num_of_product; index_product++)
+    if(ID_location_of_product_deleted != productList->product_id)
+    {
+        printf("\nError: Cannot find product ID to delete !");
+    }
+    else
+    {
+        for(int index_product = ID_location_of_product_deleted - 1; index_product < num_of_product; index_product++)
         *(productList + index_product) = *(productList + (index_product + 1));
 
-    *num_of_product--;
+        num_of_product--;
+    }
 }
 
 void findMostContributingID(product *productList, int num_of_product)
@@ -466,7 +474,7 @@ bool checkEmployeePhoneNumber(employee &employee, int index_number)
 
 void printMenu()
 {
-    printf("======================================================================\n");
+    printf("\n======================================================================\n");
     printf("==================*** PRODUCT MANAGEMENT PROGRAM ***==================\n");
     printf("======================================================================\n\n");
 
@@ -481,7 +489,7 @@ void printMenu()
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   4th    : Update product information that needs fixing            :\n"); 
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   5th    : Delete the product                                      :\n");
+    printf(":   5th    : Delete the product by ID                                :\n");
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   6th    : Find the ID of the employee with the most contributions :\n");
     printf("+----------+---------------------------------------------------------+\n");
