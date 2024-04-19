@@ -18,6 +18,7 @@ struct product
     char product_name[NAME_LENGTH];
     double product_price;
     struct product_time product_time;
+    struct employee *employee;
 };
 
 struct employee
@@ -28,6 +29,7 @@ struct employee
     char employee_gender[10];
     char employee_address[NAME_LENGTH];
     char employee_phoneNumber[10] = {0};
+    int num_products_made;
 };
 
 struct node
@@ -579,7 +581,7 @@ void printMenu()
     printf("======================================================================\n\n");
 
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   S No.  + FUNCTION                                                :\n");
+    printf(":   S No.  : FUNCTION                                                :\n");
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   1st    : Create a new product                                    :\n");
     printf("+----------+---------------------------------------------------------+\n");
@@ -587,7 +589,7 @@ void printMenu()
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   3rd    : Displays a list of products                             :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   4th    : Update product information that needs fixing            :\n"); 
+    printf(":   4th    : Update product information by product name              :\n"); 
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   5th    : Delete the product by ID                                :\n");
     printf("+----------+---------------------------------------------------------+\n");
