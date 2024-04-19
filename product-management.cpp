@@ -65,6 +65,7 @@ bool checkTime(const product &product);
 int checkPrice(const product &product);
 
 void printMenu();
+char *pop_str_last(char *str);
 
 int main()
 {
@@ -106,7 +107,7 @@ int main()
             break;
 
         case 6:
-            findMostContributingID(productList, num_of_product);
+            //findMostContributingID(productList, num_of_product);
             break;
 
         case 7:
@@ -126,7 +127,7 @@ int main()
             break;
 
         case 10:
-            addProductToFile("product_list.txt", productList, num_of_product);
+            //addProductToFile("product_list.txt", productList, num_of_product);
             break;
 
         case 0:
@@ -148,7 +149,7 @@ void initEmployeeInformation(employee *employee)
     scanf("%d", &employee->employee_id); getchar();
 
     printf("\nEnter the name of the Employee: ");
-    fgets(employee->employee_name, sizeof(employee->employee_name) + 1, stdin);
+    fgets(employee->employee_name, sizeof(employee->employee_name) + 1, stdin); pop_str_last(employee->employee_name);
 
     printf("\nEnter the age of the Employee: ");
     scanf("%d", &employee->employee_age); getchar();
@@ -162,10 +163,10 @@ void initEmployeeInformation(employee *employee)
     } while (!checkEmployeeAge(*employee));
 
     printf("\nEnter the gender of the Employee: ");
-    fgets(employee->employee_gender, sizeof(employee->employee_gender) + 1, stdin);
+    fgets(employee->employee_gender, sizeof(employee->employee_gender) + 1, stdin); pop_str_last(employee->employee_gender);
 
     printf("\nEnter the address of the Employee: ");
-    fgets(employee->employee_address, sizeof(employee->employee_address) + 1, stdin);
+    fgets(employee->employee_address, sizeof(employee->employee_address) + 1, stdin); pop_str_last(employee->employee_address);
 
     printf("\nEnter the phone number of the Employee: ");
     for(int i = 1; i < 10; i++)
@@ -272,7 +273,7 @@ void addNewProduct(product *&productList, int &num_of_product)
     scanf("%d", &new_product.product_id); getchar();
 
     printf("\nEnter the name of the Product: "); 
-    fgets(new_product.product_name, sizeof(new_product.product_name) + 1, stdin);
+    fgets(new_product.product_name, sizeof(new_product.product_name) + 1, stdin); pop_str_last(new_product.product_name);
 
     do
     {
@@ -347,8 +348,21 @@ void editProductByName(product *productList, int num_of_product)
         printf("\nEnter the name of the Product: "); 
         fgets(alternative_product.product_name, sizeof(alternative_product.product_name) + 1, stdin);
 
-        printf("\nEnter the Product's manuafacturing date: ");
-        scanf("%d%d%d", &alternative_product.product_time.day, &alternative_product.product_time.month, &alternative_product.product_time.year); 
+        do
+        {
+            printf("\nEnter the Product's manuafacturing date: ");
+            scanf("%d%d%d", &alternative_product.product_time.day, &alternative_product.product_time.month, &alternative_product.product_time.year);
+            if(!checkTime(alternative_product))
+                printf("\nError: Incorrect time format !");
+        } while (!checkTime(alternative_product));
+
+        do
+        {
+            printf("\nEnter the product's price: ");
+            scanf("%lf", &alternative_product.product_price); getchar();
+            if(!checkPrice(alternative_product))
+                printf("\nError: The product's price is a non-negative number !");
+        }   while (!checkPrice(alternative_product)); 
 
         *(productList + index_alternative_product) = alternative_product;
     }
@@ -373,7 +387,7 @@ void deleteProductByID(product *&productList, int &num_of_product)
     }
 }
 
-void findMostContributingID(product *productList, int num_of_product)
+/*void findMostContributingID(product *productList, int num_of_product)
 {
     int num_of_emoloyee_id = num_of_product;
     int arr_employee_id[num_of_emoloyee_id];
@@ -430,7 +444,7 @@ void findMostContributingID(product *productList, int num_of_product)
 
     printf("ID of the employee who contributed the most based on the number of products produced: %d", unique_elements[contribute_value]);
     printf("The contribution amount of ID %d = %d", unique_elements[contribute_value], largest_frequency);
-}
+}*/
 
 void sortProductsByPrice(product *productList, int num_of_product)
 {
@@ -448,10 +462,10 @@ void sortProductsByPrice(product *productList, int num_of_product)
     }
 }
 
-void addProductToFile(const char* filename, product *productList, int &num_of_product)
+/*void addProductToFile(const char *filename, product *&productList, int &num_of_product)
 {
-    FILE* outputFile = fopen(filename, "a");
-    if (outputFile == NULL) 
+    FILE *inputFile = fopen(filename, "a");
+    if (inputFile == NULL) 
     {
         printf("\nError: Could not open file !");
         return;
@@ -459,7 +473,7 @@ void addProductToFile(const char* filename, product *productList, int &num_of_pr
 
     addNewProduct(productList, num_of_product);
 
-    fprintf(outputFile, "%d, %s, %d, %d, %d, %d\n", 
+    fprintf(inputFile, "%d, %s, %d, %d, %d, %d\n", 
         productList->product_id, 
         productList->product_name,
         productList->product_price, 
@@ -467,8 +481,8 @@ void addProductToFile(const char* filename, product *productList, int &num_of_pr
         productList->product_time.month, 
         productList->product_time.year);
 
-    fclose(outputFile);
-}
+    fclose(inputFile);
+}*/
 
 int readProductListFromFile(const char *filename, product *system_product_list, int maxProducts)
 {
@@ -506,7 +520,7 @@ void saveProductList(const product *productList, int num_of_product)
     {
         for(int i = 0; i < num_of_product; i++)
         {
-            fprintf(output_file, "%d, %s, %d, %d/%d/%d\n",
+            fprintf(output_file, "%d, %s, %.3lf, %d/%d/%d\n",
             (productList + i)->product_id, 
             (productList + i)->product_name, 
             (productList + i)->product_price, 
@@ -580,4 +594,15 @@ void printMenu()
     printf("+----------+---------------------------------------------------------+\n");
 
     printf("\n======================================================================");
+}
+
+char *pop_str_last(char *str) {
+    const int len = strlen(str);
+    if (len == 0)
+        return '\0';
+    else 
+    {
+        str[len - 1] = '\0';
+        return str;
+    }
 }
