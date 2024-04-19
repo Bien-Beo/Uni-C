@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 
 #define MAX_PRODUCT 100
 #define INITIALIZED_SIZE 1
@@ -33,11 +32,10 @@ struct product
 };
 
 void addEmployeeInformation(employee *employee);
-
 void addNewProduct(product *&productList, int &num_of_product);
 void addNewProductList(product *&productList, int &num_of_product);
 void displayProductList(const product *productList, int num_of_product);
-int readProductListFromFile(const char *filename, struct Product *system_product_list, int maxProducts);
+int readProductListFromFile(const char *filename, struct product *system_product_list, int maxProducts);
 void addProductToFile(const char* filename, product *productList, int &num_of_product);
 void editProductByName(product *productList, int num_of_product);
 void deleteProductByID(product *productList, int *num_of_product);
@@ -46,11 +44,19 @@ void sortProductsByPrice(product *productList, int num_of_product);
 void saveProductList(const product *productList, int num_of_product);
 void printMenu();
 
+bool checkTime(const product &product);
+int checkPrice(const product &product);
+bool checkEmployeeAge(employee &employee);
+bool checkEmployeePhoneNumber(employee &employee, int index_number);
+
 int main()
 {
     product *productList = (product*)malloc(INITIALIZED_SIZE * sizeof(product));
     int num_of_product = 0;
     int ordinal;
+
+    product system_product_list[MAX_PRODUCT];
+    int num_products_system = 0;
 
     while(1)
     {
@@ -94,9 +100,8 @@ int main()
 
         case 9:
             {
-                product system_product_list[MAX_PRODUCT];
-                //int num_products_system = readProductListFromFile("product_list.txt", system_product_list, MAX_PRODUCT);
-                //displayProductList(system_product_list, num_products_system);
+                num_products_system = readProductListFromFile("product_list.txt", system_product_list, MAX_PRODUCT);
+                displayProductList(system_product_list, num_products_system);
             }
             break;
 
@@ -126,6 +131,14 @@ void addEmployeeInformation(employee *employee)
     printf("\nEnter the age of the Employee: ");
     scanf("%d", &employee->employee_age); getchar();
 
+    do
+    {
+        printf("\nEnter the age of the Employee: ");
+        scanf("%d", &employee->employee_age); getchar();
+        if(checkEmployeeAge(*employee) == false)
+            printf("\nError: Age is not within the working age range !");
+    } while (!checkEmployeeAge(*employee));
+
     printf("\nEnter the gender of the Employee: ");
     fgets(employee->employee_gender, sizeof(employee->employee_gender) + 1, stdin);
 
@@ -134,18 +147,24 @@ void addEmployeeInformation(employee *employee)
 
     printf("\nEnter the phone number of the Employee: ");
     for(int i = 1; i < 10; i++)
-        scanf("%d", &employee->employee_phoneNumber[i]); getchar();
+    {
+        do
+        {
+            scanf("%d", &employee->employee_phoneNumber[i]);
+            if(!checkEmployeePhoneNumber(*employee, i))
+                printf("\nError: Wrong phone number format !"); 
+        } while (!checkEmployeePhoneNumber(*employee, i));
+    }
+    getchar();
 }
 
 void addNewProduct(product *&productList, int &num_of_product)
 {
     num_of_product++;
-    product *arr_resizable = (product*)malloc(INITIALIZED_SIZE * sizeof(product));
+    product *arr_resizable = (product*)malloc(num_of_product * sizeof(product));
 
     for(int i = 0; i < num_of_product - 1; i++)
-        arr_resizable[i] = productList[i];
-
-    //std::copy(productList, productList + num_of_product - 1, arr_resizable);
+        *(arr_resizable + i) = productList[i];
 
     free(productList);
     productList = arr_resizable;
@@ -158,8 +177,21 @@ void addNewProduct(product *&productList, int &num_of_product)
     printf("\nEnter the name of the Product: "); 
     fgets(new_product.product_name, sizeof(new_product.product_name) + 1, stdin);
 
-    printf("\nEnter the Product's manuafacturing date: ");
-    scanf("%d%d%d", &new_product.product_time.day, &new_product.product_time.month, &new_product.product_time.year); 
+    do
+    {
+        printf("\nEnter the product's price: ");
+        scanf("%lf", &new_product.product_price); getchar();
+        if(!checkPrice(new_product))
+            printf("\nError: The product's price is a non-negative number !");
+    } while (!checkPrice(new_product));
+
+    do
+    {
+        printf("\nEnter the Product's manuafacturing date: ");
+        scanf("%d%d%d", &new_product.product_time.day, &new_product.product_time.month, &new_product.product_time.year);
+        if(!checkTime(new_product))
+            printf("\nError: Incorrect time format !");
+    } while (!checkTime(new_product));
 
     printf("\nEnter the Producter: ");
     employee new_employee; addEmployeeInformation(&new_employee); new_product.producter = new_employee;
@@ -224,13 +256,13 @@ int readProductListFromFile(const char *filename, product *system_product_list, 
     int num_products_system = 0;
 
     while (fscanf(inputFile, "%d, %[^,], %d, %d, %d, %d, %[^,]\n", 
-    &system_product_list[num_products_system].product_id, 
-    system_product_list[num_products_system].product_name,
-    &system_product_list[num_products_system].product_price, 
-    &system_product_list[num_products_system].product_time.day, 
-    &system_product_list[num_products_system].product_time.month, 
-    &system_product_list[num_products_system].product_time.year, 
-    system_product_list[num_products_system].producter.employee_name) == 7) 
+        &system_product_list[num_products_system].product_id, 
+        system_product_list[num_products_system].product_name,
+        &system_product_list[num_products_system].product_price, 
+        &system_product_list[num_products_system].product_time.day, 
+        &system_product_list[num_products_system].product_time.month, 
+        &system_product_list[num_products_system].product_time.year, 
+        system_product_list[num_products_system].producter.employee_name) == 7) 
     {
         num_products_system++;
         if (num_products_system >= maxProducts) break;
@@ -245,13 +277,18 @@ void editProductByName(product *productList, int num_of_product)
     bool marker = false;
     int index_alternative_product;
     char alternative_product_name[MAX_PRODUCT];
+
+    printf("\nEnter the name of the alternative Product: "); getchar();
     fgets(alternative_product_name, sizeof(alternative_product_name) + 1, stdin);
 
-    for(int index_product = 0; index_product < num_of_product - 1; index_product++)
+    for(int index_product = 0; index_product < num_of_product; index_product++)
     {
         int result = strcmp(alternative_product_name, (productList[index_product].product_name));
         if(result != 0)
+        {
+            printf("\nError: The requested product name was not found !");
             break;
+        }
         else
         {
             marker = true;
@@ -281,7 +318,7 @@ void editProductByName(product *productList, int num_of_product)
 
 void deleteProductByID(product *productList, int *num_of_product)
 {
-    unsigned int ID_location_of_product_deleted;
+    int ID_location_of_product_deleted;
     scanf("%d", &ID_location_of_product_deleted);
 
     for(int index_product = ID_location_of_product_deleted - 1; index_product < *num_of_product; index_product++)
@@ -371,10 +408,9 @@ void saveProductList(const product *productList, int num_of_product)
 
     if(output_file != NULL)
     {
-        for(int i = 0; i < num_of_product - 2; i++)
+        for(int i = 0; i < num_of_product; i++)
         {
-            fprintf(output_file, "%d, %d, %s, %d, %d/%d/%d, %s\n", 
-			i + 1, 
+            fprintf(output_file, "%d, %s, %d, %d/%d/%d, %s\n",
             (productList + i)->product_id, 
             (productList + i)->product_name, 
             (productList + i)->product_price, 
@@ -386,6 +422,46 @@ void saveProductList(const product *productList, int num_of_product)
     }
     else
         fprintf(stderr, "Failed to open the output file.\n");
+}
+
+bool checkTime(const product &product)
+{
+    if(product.product_time.day <= 0 || product.product_time.month <= 0 || product.product_time.year <= 0) 
+        return false;
+    if(product.product_time.month == 4 || product.product_time.month == 6 || product.product_time.month == 9 || product.product_time.month == 11)
+        if(product.product_time.day >= 30) 
+            return false;
+    else if(product.product_time.month == 2)
+    {
+        if(product.product_time.year % 4 != 0 && product.product_time.day > 28) 
+            return false;
+        else if(product.product_time.year % 4 == 0 && product.product_time.day > 29) 
+            return false;
+    }
+    else if(product.product_time.month > 12 || product.product_time.day > 31) 
+        return false;
+    else if(product.product_time.year < 1000 || product.product_time.year > 9999)
+        return false;
+    return true;
+}
+
+int checkPrice(const product &product)
+{
+    return product.product_price >= 0;
+}
+
+bool checkEmployeeAge(employee &employee)
+{
+    if(employee.employee_age > 65 || employee.employee_age < 18)
+        return false;
+    return true;
+}
+
+bool checkEmployeePhoneNumber(employee &employee, int index_number)
+{
+    if(employee.employee_phoneNumber[index_number] < 0 || employee.employee_phoneNumber[index_number] > 9)
+        return false;
+    return true;
 }
 
 void printMenu()
