@@ -59,7 +59,7 @@ void deleteProductByID(product *&productList, int &num_of_product);
 void findMostContributingID(product *productList, int num_of_product);
 void sortProductsByPrice(product *productList, int num_of_product);
 void addProductToFile(const char* filename, product *productList, int &num_of_product);
-int readProductListFromFile(const char *filename, struct product *system_product_list, int maxProducts);
+void readProductListFromFile(product *&productList, int &num_of_product);
 void saveProductList(const product *productList, int num_of_product);
 bool checkTime(const product &product);
 int checkPrice(const product &product);
@@ -71,9 +71,6 @@ int main()
 {
     int num_of_product = 0;
     product *productList = (product*)malloc(sizeof(product));
-
-    int num_products_system = 0;
-    product system_product_list[MAX_PRODUCT];
 
     int num_of_employee = 0;
     singeList employeeList; linkInitialization(employeeList);
@@ -119,11 +116,8 @@ int main()
             break;
 
         case 9:
-            {
-                num_products_system = readProductListFromFile("product_list.txt", system_product_list, MAX_PRODUCT);
-                displayProductList(system_product_list, num_products_system);
-                // bo sung chuc nang luu noi dung vao mang product
-            }
+                readProductListFromFile(productList, num_of_product);
+                displayProductList(productList, num_of_product);
             break;
 
         case 10:
@@ -304,13 +298,18 @@ void addNewProductList(product *&productList, int &num_of_product)
 
 void displayProductList(const product *productList, int num_of_product)
 {
-    for(int i = 0; i < num_of_product; i++)
+    if(num_of_product == 0)
+        printf("Error: Product list information does not exist !\n");
+    else
     {
-        printf("%d, %s, %.2lf, %d/%d/%d\n",
-            (*(productList + i)).product_id, 
-            (*(productList + i)).product_name, 
-            (*(productList + i)).product_price, 
-            (*(productList + i)).product_time.day, (*(productList + i)).product_time.month, (*(productList + i)).product_time.year);
+        for(int i = 0; i < num_of_product; i++)
+        {
+            printf("%d, %s, %.2lf, %d/%d/%d\n",
+                (*(productList + i)).product_id, 
+                (*(productList + i)).product_name, 
+                (*(productList + i)).product_price, 
+                (*(productList + i)).product_time.day, (*(productList + i)).product_time.month, (*(productList + i)).product_time.year);
+        }
     }
 }
 
@@ -484,37 +483,49 @@ void sortProductsByPrice(product *productList, int num_of_product)
     fclose(inputFile);
 }*/
 
-int readProductListFromFile(const char *filename, product *system_product_list, int maxProducts)
+void readProductListFromFile(product *&productList, int &num_of_product)
 {
-    FILE *inputFile = fopen(filename, "r");
+    int num_products_system = 0;
+    product system_product_list[MAX_PRODUCT];
+    FILE *inputFile = fopen("product_list.txt", "r");
 
     if (inputFile == NULL) 
     {
         printf("\nError: Could not open file !");
-        return 0;
-    }
+        exit(1);
+    } 
 
-    int num_products_system = 0;
-
-    while (fscanf(inputFile, "%d, %[^,], %d, %d, %d, %d\n", 
-        &system_product_list[num_products_system].product_id, 
-        system_product_list[num_products_system].product_name,
-        &system_product_list[num_products_system].product_price, 
-        &system_product_list[num_products_system].product_time.day, 
-        &system_product_list[num_products_system].product_time.month, 
-        &system_product_list[num_products_system].product_time.year) == 6) 
+    while (num_products_system < MAX_PRODUCT &&
+           fscanf(inputFile, "%d, %[^,], %lf, %d/%d/%d\n", 
+                  &system_product_list[num_products_system].product_id, 
+                  system_product_list[num_products_system].product_name,
+                  &system_product_list[num_products_system].product_price, 
+                  &system_product_list[num_products_system].product_time.day, 
+                  &system_product_list[num_products_system].product_time.month, 
+                  &system_product_list[num_products_system].product_time.year) == 6) 
     {
         num_products_system++;
-        if (num_products_system >= maxProducts) break;
+    }
+
+    num_of_product = num_products_system;
+    productList = (product*)malloc(num_products_system * sizeof(product));
+    if (productList == NULL) 
+    {
+        printf("\nError: Memory allocation failed!");
+        exit(1);
+    }
+
+    for(int i = 0; i < num_products_system; i++)
+    {
+        productList[i] = system_product_list[i];
     }
 
     fclose(inputFile);
-    return num_products_system;
 }
 
 void saveProductList(const product *productList, int num_of_product)
 {
-    FILE *output_file = fopen("product_list.txt", "w");
+    FILE *output_file = fopen("product_list.txt", "a");
 
     if(output_file != NULL)
     {
