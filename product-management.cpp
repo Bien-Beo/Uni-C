@@ -56,6 +56,7 @@ bool checkEmployeePhoneNumber(const employee employee);
 bool checkEmployeeAge(employee &employee);
 bool isDuplicateID(const singeList &employeeList, int id);
 void deleteNodeDataByID(singeList &employeeList, employee employee);
+void deleteLinkedList(singeList &employeeList);
 void readEmployeeListFromFile(singeList &employeeList);
 void saveEmployeeList(const singeList &employeeList);
 
@@ -72,7 +73,8 @@ void saveProductList(const product *productList, int num_of_product);
 bool checkTime(const product &product);
 int checkPrice(const product &product);
 
-void printMenu();
+void printMenu_Employee();
+void printMenu_Product();
 void printStatusMenu();
 char *pop_str_last(char *str);
 
@@ -86,7 +88,7 @@ int main()
 
     while(1)
     {
-        printMenu();
+        printMenu_Employee();
         int choose;
         printf("\nPlease enter your choice: "); scanf("%d", &choose);
 
@@ -98,6 +100,7 @@ int main()
 
                 employee employee_case_1;
                 addNewEmployee(employeeList, employee_case_1);
+
                 char choose_case_1;
                 int check_choose_case_1;
                 do
@@ -117,6 +120,7 @@ int main()
                     saveEmployeeList(employeeList);
                 }
 
+                deleteLinkedList(employeeList);
                 break;
             }
 
@@ -152,47 +156,55 @@ int main()
                         employeeList.pHead = pTmp_index_last->pNext;
                     }
                 }
+
+                deleteLinkedList(employeeList);
                 break;
             }
 
         case 3:
             {
                 readEmployeeListFromFile(employeeList);
+                deleteLinkedList(employeeList);
                 break;
             }
 
         case 4:
             {
-                employee employee_case_4;
-                addNewEmployee(employeeList, employee_case_4);
-                displayEmployeeList(employeeList);
+                while(1)
+                {
+                    printMenu_Product();
+                    int choose_product;
+                    printf("\nPlease enter your choice: "); scanf("%d", &choose_product);
+
+                    switch (choose_product)
+                    {
+                    case 1:
+                        readEmployeeListFromFile(employeeList);
+
+                        addNewProduct(productList, num_of_product, employeeList);
+                        saveProductList(productList, num_of_product);
+
+                        deleteLinkedList(employeeList);
+                        break;
+
+                    case 2:
+                        
+                        break;
+
+                    case 3:
+                        
+                        break;
+
+                    case 4:
+                        
+                        break;
+                    
+                    default:
+                        break;
+                    }
+                }
                 break;
             }
-
-        case 5:
-            deleteProductByID(productList, num_of_product);
-            break;
-
-        case 6:
-            //findMostContributingID(productList, num_of_product);
-            break;
-
-        case 7:
-            sortProductsByPrice(productList, num_of_product);
-            break;
-
-        case 8:
-            saveProductList(productList, num_of_product);
-            break;
-
-        case 9:
-                readProductListFromFile(productList, num_of_product);
-                displayProductList(productList, num_of_product, employeeList);
-            break;
-
-        case 10:
-            //addProductToFile("product_list.txt", productList, num_of_product);
-            break;
 
         case 0:
             free(productList);
@@ -414,6 +426,19 @@ void deleteNodeDataByID(singeList &employeeList, employee employee)
     free(current);
 }
 
+void deleteLinkedList(singeList &employeeList) 
+{
+    struct node *current = employeeList.pHead;
+    struct node *next;
+    while (current != NULL) {
+        next = current->pNext;
+        free(current);
+        current = next;
+    }
+
+    employeeList.pHead = NULL; 
+}
+
 void readEmployeeListFromFile(singeList &employeeList)
 {
     FILE *inputFile;
@@ -523,7 +548,7 @@ void addNewProduct(product *&productList, int &num_of_product, singeList &employ
     printf("\nEnter the ID of the employee in charge: ");
     scanf("%d", &employee_in_charge); getchar();
 
-    bool mark = false;
+    bool mark = false; //Chua kiem tra ID hop le
     node *current = employeeList.pHead;
     while (current != NULL)
     {
@@ -800,11 +825,12 @@ void saveProductList(const product *productList, int num_of_product)
     {
         for(int i = 0; i < num_of_product; i++)
         {
-            fprintf(output_file, "%d, %s, %.3lf, %d/%d/%d\n",
+            fprintf(output_file, "%d, %s, %.3lf, %d/%d/%d, %d\n",
             (productList + i)->product_id, 
             (productList + i)->product_name, 
             (productList + i)->product_price, 
-            (productList + i)->product_time.day, (productList + i)->product_time.month, (productList + i)->product_time.year);
+            (productList + i)->product_time.day, (productList + i)->product_time.month, (productList + i)->product_time.year,
+            (productList + i)->employee->employee_id);
         }
         printf("\nStatus: Product list saved successfully !");
         fclose(output_file);
@@ -841,10 +867,10 @@ int checkPrice(const product &product)
 
 // ------------------------------------------------------------------------------------------------------------------------
 
-void printMenu()
+void printMenu_Employee()
 {
     printf("\n======================================================================\n");
-    printf("===================*** FACTORY MANAGEMENT PROGRAM ***===================\n");
+    printf("==================*** EMPLOYEE MANAGEMENT PROGRAM ***=================\n");
     printf("======================================================================\n\n");
 
     printf("+----------+---------------------------------------------------------+\n");
@@ -856,19 +882,34 @@ void printMenu()
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   3rd    : Displays a list of employees                            :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   4th    : Update product information by product name              :\n"); 
+    printf(":   4rd    : PRODUCT MANAGEMENT PROGRAM                              :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   5th    : Delete the product by ID                                :\n");
+    printf(":    0     : Exit the program                                        :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   6th    : Find the ID of the employee with the most contributions :\n");
+
+    printf("\n======================================================================");
+}
+
+void printMenu_Product()
+{
+    printf("\n======================================================================\n");
+    printf("===================*** PRODUCT MANAGEMENT PROGRAM ***==================\n");
+    printf("======================================================================\n\n");
+
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   7th    : Sort products by price                                  :\n");
+    printf(":   S No.  : FUNCTION                                                :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   8th    : Save product list to the system                         :\n");
+    printf(":   1st    : Create a new product                                    :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   9th    : Displays the list of available products on the system   :\n");
+    printf(":   2nd    : Create a new product list                               :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   10st   : Create new products on the system (Quick feature)       :\n");
+    printf(":   3rd    : Displays a list of products                             :\n");
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":   4rd    : Delete the product by ID                                :\n");
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":   5rd    : Update product information                              :\n");
+    printf("+----------+---------------------------------------------------------+\n");
+    printf(":   6rd    : Sort Products By Price                                  :\n");
     printf("+----------+---------------------------------------------------------+\n");
     printf(":    0     : Exit the program                                        :\n");
     printf("+----------+---------------------------------------------------------+\n");
