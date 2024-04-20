@@ -12,15 +12,6 @@ struct product_time
     int year;
 };
 
-struct product
-{
-    int product_id;
-    char product_name[NAME_LENGTH];
-    double product_price;
-    struct product_time product_time;
-    struct employee *employee;
-};
-
 struct employee
 {
     int employee_id;
@@ -30,6 +21,15 @@ struct employee
     char employee_address[NAME_LENGTH];
     char employee_phoneNumber[10];
     int num_products_made;
+};
+
+struct product
+{
+    int product_id;
+    char product_name[NAME_LENGTH];
+    double product_price;
+    struct product_time product_time;
+    struct employee *employee;
 };
 
 struct node
@@ -269,7 +269,10 @@ void addNewEmployee(singeList &employeeList, employee newEmployee)
     {
         new_node = creatNewNode(newEmployee);
         if (new_node->data.employee_id != 0 && isDuplicateID(employeeList, new_node->data.employee_id))
+        {
             printf("\nError: Duplicate employee ID!");
+            free(new_node);
+        }
     } while (new_node->data.employee_id != 0 && isDuplicateID(employeeList, new_node->data.employee_id));
 
     if(isEmpty(employeeList))
@@ -419,11 +422,12 @@ void readEmployeeListFromFile(singeList &employeeList)
                 employee_replacement.employee_phoneNumber,
                 &employee_replacement.num_products_made) == 7)
                 {
-                    printf("\nStatus: Loading employee data !\n\n");
+                    printf("\nStatus: Loading employee data !");
                     addNewEmployeeListToFile(employeeList, employee_replacement);
-                    displayEmployeeList(employeeList);
                     printf("\nStatus: Upload data successfully !\n");
                 }
+    printf("\n");
+    displayEmployeeList(employeeList);
 
     fclose(inputFile);
 }
