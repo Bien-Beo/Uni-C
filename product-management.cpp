@@ -30,6 +30,7 @@ struct product
     double product_price;
     struct product_time product_time;
     struct employee *employee;
+    int key;
 };
 
 struct node
@@ -62,6 +63,7 @@ void saveEmployeeList(const singeList &employeeList);
 
 void addNewProduct(product *&productList, int &num_of_product, singeList &employeeList);
 void addNewProductList(product *&productList, int &num_of_product, singeList &employeeList);
+void addNewProductToFile(product *&productList, int &num_of_product, product *newProduct);
 void displayProductList(const product *productList, int num_of_product, singeList &employeeList);
 void editProductByName(product *productList, int num_of_product);
 void deleteProductByID(product *&productList, int &num_of_product);
@@ -69,7 +71,7 @@ void deleteProductList(struct product *productList, int &num_of_product);
 void findMostContributingID(product *productList, int num_of_product);
 void sortProductsByPrice(product *productList, int num_of_product);
 void addProductToFile(const char* filename, product *productList, int &num_of_product);
-void readProductListFromFile(product *&productList, int &num_of_product);
+void readProductListFromFile(product *&productList, int &num_of_product, singeList &employeeList);
 void saveProductList(const product *productList, int num_of_product);
 bool checkTime(const product &product);
 int checkPrice(const product &product);
@@ -171,84 +173,56 @@ int main()
 
         case 4:
             {
-                while(1)
+                printMenu_Product();
+                int choose_product;
+                printf("\nPlease enter your choice: "); scanf("%d", &choose_product);
+
+                if(choose_product == 1)
                 {
-                    printMenu_Product();
-                    int choose_product;
-                    printf("\nPlease enter your choice: "); scanf("%d", &choose_product);
+                    readProductListFromFile(productList, num_of_product, employeeList);
+                    addNewProduct(productList, num_of_product, employeeList);
 
-                    switch (choose_product)
+                    char choose_case_1;
+                    int check_choose_case_1;
+                    do
                     {
-                    case 1:
-                        {
-                            readEmployeeListFromFile(employeeList);
-                            readProductListFromFile(productList, num_of_product);
-                            addNewProduct(productList, num_of_product, employeeList);
+                        printStatusMenu();
+                        printf("Please enter your choice: "); scanf("%c", &choose_case_1);
+                        check_choose_case_1 = (int)choose_case_1;
+                        if(check_choose_case_1 != 121 && check_choose_case_1 != 89 && check_choose_case_1 != 110 && check_choose_case_1 != 78)
+                            printf("\nError: Invalid selection !");
+                    } while (check_choose_case_1 != 121 && check_choose_case_1 != 89 && check_choose_case_1 != 110 && check_choose_case_1 != 78);
 
-                            char choose_case_1;
-                            int check_choose_case_1;
-                            do
-                            {
-                                printStatusMenu();
-                                printf("Please enter your choice: "); scanf("%c", &choose_case_1);
-                                check_choose_case_1 = (int)choose_case_1;
-                                if(check_choose_case_1 != 121 && check_choose_case_1 != 89 && check_choose_case_1 != 110 && check_choose_case_1 != 78)
-                                    printf("\nError: Invalid selection !");
-                            } while (check_choose_case_1 != 121 && check_choose_case_1 != 89 && check_choose_case_1 != 110 && check_choose_case_1 != 78);
-
-                            if(check_choose_case_1 == 121 || check_choose_case_1 == 89)
-                            {
-                                saveEmployeeList(employeeList);
-                                saveProductList(productList, num_of_product);
-                            }
-                            else if(check_choose_case_1 == 110 || check_choose_case_1 == 78)
-                            {
-                                saveEmployeeList(employeeList);
-                            }
-
-                            deleteProductList(productList, num_of_employee);
-                            deleteLinkedList(employeeList);
-                            break;
-                        }
-
-                    case 2:
-                        {
-                            readEmployeeListFromFile(employeeList);
-
-                            addNewProductList(productList, num_of_product, employeeList);
-                            saveProductList(productList, num_of_product);
-
-                            deleteLinkedList(employeeList);
-                            break;
-                        }
-                    case 3: //display
-                        {
-                            readEmployeeListFromFile(employeeList);
-                            break;
-                        }
-
-                    case 4: //delete
-                        {
-                            readEmployeeListFromFile(employeeList);
-                            break;
-                        }
-
-                    case 5: //update
-                        {
-                            readEmployeeListFromFile(employeeList);
-                            break;
-                        }
-
-                    case 6: //sort
-                        {
-                            readEmployeeListFromFile(employeeList);
-                            break;
-                        }
-                    
-                    default:
-                        break;
+                    if(check_choose_case_1 == 121 || check_choose_case_1 == 89)
+                    {
+                        saveEmployeeList(employeeList);
+                        saveProductList(productList, num_of_product);
                     }
+                    else if(check_choose_case_1 == 110 || check_choose_case_1 == 78)
+                    {
+                        saveEmployeeList(employeeList);
+                    }
+
+                    deleteProductList(productList, num_of_employee);
+                    deleteLinkedList(employeeList);
                 }
+
+                else if(choose_product == 2)
+                {
+                    readEmployeeListFromFile(employeeList);
+
+                    addNewProductList(productList, num_of_product, employeeList);
+                    saveProductList(productList, num_of_product);
+                    deleteLinkedList(employeeList);
+                }
+
+                else if(choose_product == 3)
+                {
+                    readProductListFromFile(productList, num_of_product, employeeList);
+                    deleteLinkedList(employeeList);
+                    deleteProductList(productList, num_of_product);
+                }
+
                 break;
             }
 
@@ -256,6 +230,7 @@ int main()
             free(productList);
             return 0;
 
+        choose:
         default:
             free(productList);
             return 0;
@@ -616,6 +591,22 @@ void addNewProduct(product *&productList, int &num_of_product, singeList &employ
     } while(!mark);
 
     arr_resizable[num_of_product - 1] = new_product;
+    printf("\nStatus: Product added successfully !");
+}
+
+void addNewProductToFile(product *&productList, int &num_of_product, product *newProduct)
+{
+    num_of_product++;
+    product *arr_resizable = (product*)malloc(num_of_product * sizeof(product));
+
+    for(int i = 0; i < num_of_product - 1; i++)
+        *(arr_resizable + i) = productList[i];
+
+    free(productList);
+    productList = arr_resizable;
+
+    arr_resizable[num_of_product - 1] = *newProduct;
+    printf("\nStatus: Downloading employee data successfully !");
 }
 
 void addNewProductList(product *&productList, int &num_of_product, singeList &employeeList)
@@ -840,45 +831,51 @@ void sortProductsByPrice(product *productList, int num_of_product)
     fclose(inputFile);
 }*/
 
-void readProductListFromFile(product *&productList, int &num_of_product)
+void readProductListFromFile(product *&productList, int &num_of_product, singeList &employeeList)
 {
-    int num_products_system = 0;
-    product system_product_list[MAX_PRODUCT];
-    FILE *inputFile = fopen("product_list.txt", "r");
+    readEmployeeListFromFile(employeeList);
 
-    if (inputFile == NULL) 
+    FILE *inputFile;
+    do
     {
-        printf("\nError: Could not open file !");
-        return;
-    } 
+        inputFile = fopen("product_list.txt", "r");
+        if (inputFile == NULL) 
+        {
+            printf("\nError: Could not open file !");
+            return;
+        }
+    } while (inputFile == NULL);
 
-    while (num_products_system < MAX_PRODUCT &&
-           fscanf(inputFile, "%d, %[^,], %lf, %d/%d/%d, %d\n", 
-                  &system_product_list[num_products_system].product_id, 
-                  system_product_list[num_products_system].product_name,
-                  &system_product_list[num_products_system].product_price, 
-                  &system_product_list[num_products_system].product_time.day, 
-                  &system_product_list[num_products_system].product_time.month, 
-                  &system_product_list[num_products_system].product_time.year,
-                  &system_product_list[num_products_system].employee->employee_id) == 7) 
+	while (true) 
     {
-        num_products_system++;
+        product new_product;
+        int result = fscanf(inputFile, "%d, %[^,], %lf, %d/%d/%d, %d\n",
+                          &new_product.product_id,
+                          new_product.product_name,
+                          &new_product.product_price,
+                          &new_product.product_time.day,
+                          &new_product.product_time.month,
+                          &new_product.product_time.year,
+                          &new_product.key);
+
+        if (result != 7) 
+            break;
+
+        node *current_node = employeeList.pHead;
+        while (current_node != NULL)
+        {
+            if (current_node->data.employee_id == new_product.key)
+            {
+                new_product.employee = &(current_node->data);
+                printf("\nStatus: Loading employee data !");
+                break;
+            }
+            current_node = current_node->pNext;
+        }
+
+        addNewProductToFile(productList, num_of_product, &new_product);
     }
 
-    num_of_product = num_products_system;
-    productList = (product*)malloc(num_of_product * sizeof(product));
-    if (productList == NULL) 
-    {
-        printf("\nError: Memory allocation failed!");
-        return;
-    }
-
-    for(int i = 0; i < num_of_product; i++)
-    {
-        productList[i] = system_product_list[i];
-    }
-
-    free(system_product_list);
     fclose(inputFile);
 }
 
