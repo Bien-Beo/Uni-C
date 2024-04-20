@@ -48,14 +48,14 @@ void initEmployeeInformation(employee *employee);
 node *creatNewNode(employee employee);
 void linkInitialization(singeList &employeeList);
 bool isEmpty(singeList &employeeList);
-void addNewEmployee(singeList &employeeList, employee employee);
+void addNewEmployee(singeList &employeeList, employee newEmployee);
 void addNewEmployeeList(singeList &employeeList, employee employee);
-void addNewEmployeeListToFile(singeList &employeeList, employee employee);
+void addNewEmployeeListToFile(singeList &employeeList, employee newEmployee);
 void displayEmployeeList(singeList &employeeList);
 bool checkEmployeePhoneNumber(const employee employee);
 bool checkEmployeeAge(employee &employee);
 bool isDuplicateID(const singeList &employeeList, int id);
-void deleteNodeData(singeList &employeeList, employee employee);
+void deleteNodeDataByID(singeList &employeeList, employee employee);
 void readEmployeeListFromFile(singeList &employeeList);
 void saveEmployeeList(const singeList &employeeList);
 
@@ -98,7 +98,6 @@ int main()
 
                 employee employee_case_1;
                 addNewEmployee(employeeList, employee_case_1);
-                
                 char choose_case_1;
                 int check_choose_case_1;
                 do
@@ -114,9 +113,10 @@ int main()
                     saveEmployeeList(employeeList);
                 else if(check_choose_case_1 == 110 || check_choose_case_1 == 78)
                 {
-                    deleteNodeData(employeeList, employee_case_1);
+                    deleteNodeDataByID(employeeList, employee_case_1);
                     saveEmployeeList(employeeList);
                 }
+
                 break;
             }
 
@@ -124,7 +124,8 @@ int main()
             {
                 readEmployeeListFromFile(employeeList);
 
-                node *pTmp_index_last = employeeList.pTail;
+                node *pTmp_index_last;
+                node *firstNode  = employeeList.pHead;
                 employee employee_case_2;
                 addNewEmployeeList(employeeList, employee_case_2);
 
@@ -143,22 +144,30 @@ int main()
                     saveEmployeeList(employeeList);
                 else if(check_choose_case_2 == 110 || check_choose_case_2 == 78)
                 {
-                    while(pTmp_index_last != NULL)
+                    displayEmployeeList(employeeList);
+                    pTmp_index_last = employeeList.pHead;
+                    while(pTmp_index_last != firstNode)
                     {
-                        deleteNodeData(employeeList, pTmp_index_last->data);
-                        pTmp_index_last = pTmp_index_last->pNext;
+                        pTmp_index_last = employeeList.pHead;
+                        employeeList.pHead = pTmp_index_last->pNext;
                     }
                 }
                 break;
             }
 
         case 3:
-            displayEmployeeList(employeeList);
-            break;
+            {
+                readEmployeeListFromFile(employeeList);
+                break;
+            }
 
         case 4:
-            editProductByName(productList, num_of_product);
-            break;
+            {
+                employee employee_case_4;
+                addNewEmployee(employeeList, employee_case_4);
+                displayEmployeeList(employeeList);
+                break;
+            }
 
         case 5:
             deleteProductByID(productList, num_of_product);
@@ -264,25 +273,28 @@ bool isEmpty(singeList &employeeList)
 
 void addNewEmployee(singeList &employeeList, employee newEmployee)
 {
+    bool mark;
 	node *new_node;
     do
     {
+        mark = false;
         new_node = creatNewNode(newEmployee);
-        if (new_node->data.employee_id != 0 && isDuplicateID(employeeList, new_node->data.employee_id))
+        if(new_node->data.employee_id != 0 && isDuplicateID(employeeList, new_node->data.employee_id))
         {
-            printf("\nError: Duplicate employee ID!");
+            printf("\nError: Duplicate employee ID!\n");
+            mark = true;
             free(new_node);
         }
-    } while (new_node->data.employee_id != 0 && isDuplicateID(employeeList, new_node->data.employee_id));
+    } while(mark);
 
     if(isEmpty(employeeList))
         employeeList.pHead = employeeList.pTail = new_node;
     else
     {
-        employeeList.pTail->pNext = new_node;
-        employeeList.pTail = new_node;
+        new_node->pNext = employeeList.pHead;
+        employeeList.pHead = new_node;
     }
-    printf("\nStatus: Successfully added new employee !");
+    printf("\nStatus: Successfully added new employee !\n");
 }
 
 void addNewEmployeeList(singeList &employeeList, employee employee)
@@ -300,10 +312,10 @@ void addNewEmployeeList(singeList &employeeList, employee employee)
     printf("\nStatus: Added employee list successfully !");
 }
 
-void addNewEmployeeListToFile(singeList &employeeList, employee employee)
+void addNewEmployeeListToFile(singeList &employeeList, employee newEmployee)
 {
     node *newNode = (node*)malloc(sizeof(node));
-    newNode->data = employee;
+    newNode->data = newEmployee;
     newNode->pNext = NULL;
 
     if (employeeList.pHead == NULL)
@@ -375,7 +387,7 @@ bool isDuplicateID(const singeList &employeeList, int id)
     return false;
 }
 
-void deleteNodeData(singeList &employeeList, employee employee) 
+void deleteNodeDataByID(singeList &employeeList, employee employee) 
 {
     node *current = employeeList.pHead;
     node *previous = NULL;
@@ -429,6 +441,7 @@ void readEmployeeListFromFile(singeList &employeeList)
     printf("\n");
     displayEmployeeList(employeeList);
 
+    rewind(inputFile);
     fclose(inputFile);
 }
 
