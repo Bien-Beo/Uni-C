@@ -67,7 +67,7 @@ void addNewProductToFile(product *&productList, int &num_of_product, product *ne
 void displayProductList(const product *productList, int num_of_product, singeList &employeeList);
 void editProductByName(product *productList, int num_of_product);
 void deleteProductByID(product *&productList, int &num_of_product);
-void deleteProductList(struct product *productList, int &num_of_product);
+void deleteProductList(struct product *&productList, int &num_of_product);
 void findMostContributingID(product *productList, int num_of_product);
 void sortProductsByPrice(product *productList, int num_of_product);
 void addProductToFile(const char* filename, product *productList, int &num_of_product);
@@ -200,7 +200,7 @@ int main()
                     }
                     else if(check_choose_case_1 == 110 || check_choose_case_1 == 78)
                     {
-                        saveEmployeeList(employeeList);
+                        saveEmployeeList(employeeList); // chua fix
                     }
 
                     deleteProductList(productList, num_of_employee);
@@ -209,18 +209,40 @@ int main()
 
                 else if(choose_product == 2)
                 {
-                    readEmployeeListFromFile(employeeList);
-
+                    readProductListFromFile(productList, num_of_product, employeeList);
                     addNewProductList(productList, num_of_product, employeeList);
-                    saveProductList(productList, num_of_product);
+
+                    char choose_case_2;
+                    int check_choose_case_2;
+                    do
+                    {
+                        printStatusMenu();
+                        printf("Please enter your choice: "); scanf("%c", &choose_case_2);
+                        check_choose_case_2 = (int)choose_case_2;
+                        if(check_choose_case_2 != 121 && check_choose_case_2 != 89 && check_choose_case_2 != 110 && check_choose_case_2 != 78)
+                            printf("\nError: Invalid selection !");
+                    } while (check_choose_case_2 != 121 && check_choose_case_2 != 89 && check_choose_case_2 != 110 && check_choose_case_2 != 78);
+
+                    if(check_choose_case_2 == 121 || check_choose_case_2 == 89)
+                    {
+                        saveEmployeeList(employeeList);
+                        saveProductList(productList, num_of_product);
+                    }
+                    else if(check_choose_case_2 == 110 || check_choose_case_2 == 78)
+                    {
+                        saveEmployeeList(employeeList); // chua fix
+                    }
+
+                    deleteProductList(productList, num_of_employee);
                     deleteLinkedList(employeeList);
                 }
 
                 else if(choose_product == 3)
                 {
                     readProductListFromFile(productList, num_of_product, employeeList);
-                    deleteLinkedList(employeeList);
+                    displayProductList(productList, num_of_product, employeeList);
                     deleteProductList(productList, num_of_product);
+                    deleteLinkedList(employeeList);
                 }
 
                 break;
@@ -382,6 +404,7 @@ void displayEmployeeList(singeList &employeeList)
             pTmp->data.num_products_made);
         pTmp = pTmp->pNext;
     }
+    printf("\nStatus: Display list of employees successfully !\n");
 }
 
 bool checkEmployeePhoneNumber(const employee employee)
@@ -533,7 +556,13 @@ void saveEmployeeList(const singeList &employeeList)
 void addNewProduct(product *&productList, int &num_of_product, singeList &employeeList)
 {
     num_of_product++;
-    product *arr_resizable = (product*)malloc(num_of_product * sizeof(product));
+    product *arr_resizable;
+    do
+    {
+        arr_resizable = (product*)malloc(num_of_product * sizeof(product));
+        if(arr_resizable == NULL)
+            printf("\nError: Allocating memory !");
+    } while (arr_resizable == NULL);
 
     for(int i = 0; i < num_of_product - 1; i++)
         *(arr_resizable + i) = productList[i];
@@ -597,7 +626,13 @@ void addNewProduct(product *&productList, int &num_of_product, singeList &employ
 void addNewProductToFile(product *&productList, int &num_of_product, product *newProduct)
 {
     num_of_product++;
-    product *arr_resizable = (product*)malloc(num_of_product * sizeof(product));
+    product *arr_resizable;
+    do
+    {
+        arr_resizable = (product*)malloc(num_of_product * sizeof(product));
+        if(arr_resizable == NULL)
+            printf("\nError: Allocating memory !");
+    } while (arr_resizable == NULL);
 
     for(int i = 0; i < num_of_product - 1; i++)
         *(arr_resizable + i) = productList[i];
@@ -611,10 +646,19 @@ void addNewProductToFile(product *&productList, int &num_of_product, product *ne
 
 void addNewProductList(product *&productList, int &num_of_product, singeList &employeeList)
 {
-    int quantity; scanf("%d", &quantity);
+    int quantity;
+    do
+    {
+        printf("\nEnter the number of products: "); scanf("%d", &quantity); getchar();
+        if(quantity <= 0)
+            printf("\nError: Number of products cannot be negative !");
+    } while (quantity <= 0);
+
     int newSize = num_of_product + quantity;
     for(int i = num_of_product; i < newSize; i++)
         addNewProduct(productList, num_of_product, employeeList);
+
+    printf("\nStatus: Added product list successfully !");
 }
 
 void displayProductList(const product *productList, int num_of_product, singeList &employeeList)
@@ -625,25 +669,14 @@ void displayProductList(const product *productList, int num_of_product, singeLis
     {
         for(int i = 0; i < num_of_product; i++)
         {
-            node *current = employeeList.pHead;
-            int employee_in_charge;
-            while (current != NULL)
-            {
-                if(&(current->data) == (*(productList + i)).employee)
-                {
-                    employee_in_charge = current->data.employee_id;
-                    break;
-                }
-                current = current->pNext;
-            }
-
             printf("%d, %s, %.2lf, %d/%d/%d, %d\n",
                 (*(productList + i)).product_id, 
                 (*(productList + i)).product_name, 
                 (*(productList + i)).product_price, 
-                (*(productList + i)).product_time.day, (*(productList + i)).product_time.month, (*(productList + i)).product_time.year),
-                employee_in_charge;
+                (*(productList + i)).product_time.day, (*(productList + i)).product_time.month, (*(productList + i)).product_time.year,
+                (*(productList + i)).employee->employee_id);
         }
+        printf("\nStatus: Displaying product list successfully !");
     }
 }
 
@@ -720,18 +753,19 @@ void deleteProductByID(product *&productList, int &num_of_product)
     }
 }
 
-void deleteProductList(struct product *productList, int &num_of_product) 
+void deleteProductList(struct product *&productList, int &num_of_product) 
 {
-    if (productList == NULL)
-        return; 
-
-    for (int i = 0; i < num_of_product; i++)
+    if (productList != NULL)
     {
-        free(productList[i].employee); 
-        num_of_product--;
+        delete[] productList;
+        productList = NULL;
+        num_of_product = 0;
+        printf("\nStatus: Successfully deleted the product array !");
     }
-
-    free(productList); 
+    else
+    {
+        printf("\nError: Product array does not exist !");
+    }
 }
 
 /*void findMostContributingID(product *productList, int num_of_product)
@@ -873,7 +907,7 @@ void readProductListFromFile(product *&productList, int &num_of_product, singeLi
             current_node = current_node->pNext;
         }
 
-        addNewProductToFile(productList, num_of_product, &new_product);
+        addNewProductToFile(productList, num_of_product, &new_product); printf("\n");
     }
 
     fclose(inputFile);
