@@ -65,6 +65,7 @@ void addNewProductList(product *&productList, int &num_of_product, singeList &em
 void displayProductList(const product *productList, int num_of_product, singeList &employeeList);
 void editProductByName(product *productList, int num_of_product);
 void deleteProductByID(product *&productList, int &num_of_product);
+void deleteProductList(struct product *productList, int &num_of_product);
 void findMostContributingID(product *productList, int num_of_product);
 void sortProductsByPrice(product *productList, int num_of_product);
 void addProductToFile(const char* filename, product *productList, int &num_of_product);
@@ -179,25 +180,70 @@ int main()
                     switch (choose_product)
                     {
                     case 1:
-                        readEmployeeListFromFile(employeeList);
+                        {
+                            readEmployeeListFromFile(employeeList);
+                            readProductListFromFile(productList, num_of_product);
+                            addNewProduct(productList, num_of_product, employeeList);
 
-                        addNewProduct(productList, num_of_product, employeeList);
-                        saveProductList(productList, num_of_product);
+                            char choose_case_1;
+                            int check_choose_case_1;
+                            do
+                            {
+                                printStatusMenu();
+                                printf("Please enter your choice: "); scanf("%c", &choose_case_1);
+                                check_choose_case_1 = (int)choose_case_1;
+                                if(check_choose_case_1 != 121 && check_choose_case_1 != 89 && check_choose_case_1 != 110 && check_choose_case_1 != 78)
+                                    printf("\nError: Invalid selection !");
+                            } while (check_choose_case_1 != 121 && check_choose_case_1 != 89 && check_choose_case_1 != 110 && check_choose_case_1 != 78);
 
-                        deleteLinkedList(employeeList);
-                        break;
+                            if(check_choose_case_1 == 121 || check_choose_case_1 == 89)
+                            {
+                                saveEmployeeList(employeeList);
+                                saveProductList(productList, num_of_product);
+                            }
+                            else if(check_choose_case_1 == 110 || check_choose_case_1 == 78)
+                            {
+                                saveEmployeeList(employeeList);
+                            }
+
+                            deleteProductList(productList, num_of_employee);
+                            deleteLinkedList(employeeList);
+                            break;
+                        }
 
                     case 2:
-                        
-                        break;
+                        {
+                            readEmployeeListFromFile(employeeList);
 
-                    case 3:
-                        
-                        break;
+                            addNewProductList(productList, num_of_product, employeeList);
+                            saveProductList(productList, num_of_product);
 
-                    case 4:
-                        
-                        break;
+                            deleteLinkedList(employeeList);
+                            break;
+                        }
+                    case 3: //display
+                        {
+                            readEmployeeListFromFile(employeeList);
+                            break;
+                        }
+
+                    case 4: //delete
+                        {
+                            readEmployeeListFromFile(employeeList);
+                            break;
+                        }
+
+                    case 5: //update
+                        {
+                            readEmployeeListFromFile(employeeList);
+                            break;
+                        }
+
+                    case 6: //sort
+                        {
+                            readEmployeeListFromFile(employeeList);
+                            break;
+                        }
                     
                     default:
                         break;
@@ -498,7 +544,7 @@ void saveEmployeeList(const singeList &employeeList)
             current_node = current_node->pNext;
         }
 
-        printf("\nStatus: Product list saved successfully !");
+        printf("\nStatus: Employee list saved successfully !");
         fclose(output_file);
     }
     else
@@ -548,23 +594,26 @@ void addNewProduct(product *&productList, int &num_of_product, singeList &employ
     printf("\nEnter the ID of the employee in charge: ");
     scanf("%d", &employee_in_charge); getchar();
 
-    bool mark = false; //Chua kiem tra ID hop le
-    node *current = employeeList.pHead;
-    while (current != NULL)
+    bool mark = false; 
+    do
     {
-        if(current->data.employee_id == employee_in_charge)
+        node *current = employeeList.pHead;
+        while (current != NULL)
         {
-            current->data.num_products_made++;
-            new_product.employee = &(current->data);
-            mark = true;
-            break;
+            if(current->data.employee_id == employee_in_charge)
+            {
+                current->data.num_products_made++;
+                new_product.employee = &(current->data);
+                mark = true;
+                break;
+            }
+            current = current->pNext;
         }
-        current = current->pNext;
-    }
-    if(mark)
-        printf("\nStatus: The employee's ID has been successfully added !");
-    else
-        printf("\nError: Employee ID not found !");
+        if(mark)
+            printf("\nStatus: The employee's ID has been successfully added !");
+        else
+            printf("\nError: Employee ID not found !");
+    } while(!mark);
 
     arr_resizable[num_of_product - 1] = new_product;
 }
@@ -680,6 +729,20 @@ void deleteProductByID(product *&productList, int &num_of_product)
     }
 }
 
+void deleteProductList(struct product *productList, int &num_of_product) 
+{
+    if (productList == NULL)
+        return; 
+
+    for (int i = 0; i < num_of_product; i++)
+    {
+        free(productList[i].employee); 
+        num_of_product--;
+    }
+
+    free(productList); 
+}
+
 /*void findMostContributingID(product *productList, int num_of_product)
 {
     int num_of_emoloyee_id = num_of_product;
@@ -786,34 +849,36 @@ void readProductListFromFile(product *&productList, int &num_of_product)
     if (inputFile == NULL) 
     {
         printf("\nError: Could not open file !");
-        exit(1);
+        return;
     } 
 
     while (num_products_system < MAX_PRODUCT &&
-           fscanf(inputFile, "%d, %[^,], %lf, %d/%d/%d\n", 
+           fscanf(inputFile, "%d, %[^,], %lf, %d/%d/%d, %d\n", 
                   &system_product_list[num_products_system].product_id, 
                   system_product_list[num_products_system].product_name,
                   &system_product_list[num_products_system].product_price, 
                   &system_product_list[num_products_system].product_time.day, 
                   &system_product_list[num_products_system].product_time.month, 
-                  &system_product_list[num_products_system].product_time.year) == 6) 
+                  &system_product_list[num_products_system].product_time.year,
+                  &system_product_list[num_products_system].employee->employee_id) == 7) 
     {
         num_products_system++;
     }
 
     num_of_product = num_products_system;
-    productList = (product*)malloc(num_products_system * sizeof(product));
+    productList = (product*)malloc(num_of_product * sizeof(product));
     if (productList == NULL) 
     {
         printf("\nError: Memory allocation failed!");
-        exit(1);
+        return;
     }
 
-    for(int i = 0; i < num_products_system; i++)
+    for(int i = 0; i < num_of_product; i++)
     {
         productList[i] = system_product_list[i];
     }
 
+    free(system_product_list);
     fclose(inputFile);
 }
 
