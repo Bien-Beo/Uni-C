@@ -28,7 +28,7 @@ struct employee
     int employee_age;
     char employee_gender[10];
     char employee_address[NAME_LENGTH];
-    char employee_phoneNumber[10] = {0};
+    char employee_phoneNumber[10];
     int num_products_made;
 };
 
@@ -50,9 +50,12 @@ void linkInitialization(singeList &employeeList);
 bool isEmpty(singeList &employeeList);
 void addNewEmployee(singeList &employeeList, employee employee);
 void addNewEmployeeList(singeList &employeeList, employee employee);
+void addNewEmployeeListToFile(singeList &employeeList, employee employee);
 void displayEmployeeList(singeList &employeeList);
-bool checkEmployeePhoneNumber(employee &employee, int index_number);
+bool checkEmployeePhoneNumber(const employee employee);
 bool checkEmployeeAge(employee &employee);
+bool isDuplicateID(const singeList &employeeList, int id);
+void deleteNodeData(singeList &employeeList, employee employee);
 void readEmployeeListFromFile(singeList &employeeList);
 void saveEmployeeList(const singeList &employeeList);
 
@@ -70,6 +73,7 @@ bool checkTime(const product &product);
 int checkPrice(const product &product);
 
 void printMenu();
+void printStatusMenu();
 char *pop_str_last(char *str);
 
 int main()
@@ -79,7 +83,6 @@ int main()
 
     int num_of_employee = 0;
     singeList employeeList; linkInitialization(employeeList);
-    employee employee;
 
     while(1)
     {
@@ -90,12 +93,64 @@ int main()
         switch(choose)
         {
         case 1:
-            addNewEmployee(employeeList, employee);
-            break;
+            {
+                readEmployeeListFromFile(employeeList);
+
+                employee employee_case_1;
+                addNewEmployee(employeeList, employee_case_1);
+                
+                char choose_case_1;
+                int check_choose_case_1;
+                do
+                {
+                    printStatusMenu();
+                    printf("Please enter your choice: "); scanf("%c", &choose_case_1);
+                    check_choose_case_1 = (int)choose_case_1;
+                    if(check_choose_case_1 != 121 && check_choose_case_1 != 89 && check_choose_case_1 != 110 && check_choose_case_1 != 78)
+                        printf("\nError: Invalid selection !");
+                } while (check_choose_case_1 != 121 && check_choose_case_1 != 89 && check_choose_case_1 != 110 && check_choose_case_1 != 78);
+
+                if(check_choose_case_1 == 121 || check_choose_case_1 == 89)
+                    saveEmployeeList(employeeList);
+                else if(check_choose_case_1 == 110 || check_choose_case_1 == 78)
+                {
+                    deleteNodeData(employeeList, employee_case_1);
+                    saveEmployeeList(employeeList);
+                }
+                break;
+            }
 
         case 2:
-            addNewEmployeeList(employeeList, employee);
-            break;
+            {
+                readEmployeeListFromFile(employeeList);
+
+                node *pTmp_index_last = employeeList.pTail;
+                employee employee_case_2;
+                addNewEmployeeList(employeeList, employee_case_2);
+
+                char choose_case_2;
+                int check_choose_case_2;
+                do
+                {
+                    printStatusMenu();
+                    printf("Please enter your choice: "); scanf("%c", &choose_case_2);
+                    check_choose_case_2 = (int)choose_case_2;
+                    if(check_choose_case_2 != 121 && check_choose_case_2 != 89 && check_choose_case_2 != 110 && check_choose_case_2 != 78)
+                        printf("\nError: Invalid selection !");
+                } while (check_choose_case_2 != 121 && check_choose_case_2 != 89 && check_choose_case_2 != 110 && check_choose_case_2 != 78);
+
+                if(check_choose_case_2 == 121 || check_choose_case_2 == 89)
+                    saveEmployeeList(employeeList);
+                else if(check_choose_case_2 == 110 || check_choose_case_2 == 78)
+                {
+                    while(pTmp_index_last != NULL)
+                    {
+                        deleteNodeData(employeeList, pTmp_index_last->data);
+                        pTmp_index_last = pTmp_index_last->pNext;
+                    }
+                }
+                break;
+            }
 
         case 3:
             displayEmployeeList(employeeList);
@@ -151,16 +206,13 @@ void initEmployeeInformation(employee *employee)
     printf("\nEnter the name of the Employee: ");
     fgets(employee->employee_name, sizeof(employee->employee_name) + 1, stdin); pop_str_last(employee->employee_name);
 
-    printf("\nEnter the age of the Employee: ");
-    scanf("%d", &employee->employee_age); getchar();
-
     do
     {
         printf("\nEnter the age of the Employee: ");
         scanf("%d", &employee->employee_age); getchar();
-        if(checkEmployeeAge(*employee) == false)
-            printf("\nError: Age is not within the working age range !");
-    } while (!checkEmployeeAge(*employee));
+        if(checkEmployeeAge(*employee))
+            printf("\nError: Age is not within working age !");
+    } while (checkEmployeeAge(*employee));
 
     printf("\nEnter the gender of the Employee: ");
     fgets(employee->employee_gender, sizeof(employee->employee_gender) + 1, stdin); pop_str_last(employee->employee_gender);
@@ -168,31 +220,32 @@ void initEmployeeInformation(employee *employee)
     printf("\nEnter the address of the Employee: ");
     fgets(employee->employee_address, sizeof(employee->employee_address) + 1, stdin); pop_str_last(employee->employee_address);
 
-    printf("\nEnter the phone number of the Employee: ");
-    for(int i = 1; i < 10; i++)
+    do
     {
-        do
-        {
-            scanf("%d", &employee->employee_phoneNumber[i]);
-            if(!checkEmployeePhoneNumber(*employee, i))
-                printf("\nError: Wrong phone number format !"); 
-        } while (checkEmployeePhoneNumber(*employee, i));
-    }
+        printf("\nRequirement: Only enter 9 numbers after the first 0 !");
+        printf("\nEnter the phone number of the Employee: ");
+        scanf("%10s", &employee->employee_phoneNumber);
+        if(!checkEmployeePhoneNumber(*employee))
+            printf("\nError: Wrong phone number format !"); 
+    } while (!checkEmployeePhoneNumber(*employee));
 
-    printf("\nNumber of products made: 0");
+    printf("\nNumber of products made: 0\n");
     employee->num_products_made = 0;
     getchar();
+
+    printf("\nStatus: Created employee information successfully !");
 }
 
 node *creatNewNode(employee employee)
 {
-    node *pNode = (node*)malloc(sizeof(node));
-    if(pNode == NULL)
+	node *pNode;
+    do
     {
-        printf("\nError: Allocating memory !");
-        return NULL;
-    }
-
+        pNode = (node*)malloc(sizeof(node));
+        if(pNode == NULL)
+            printf("\nError: Allocating memory !");
+    }while(pNode == NULL);
+    
     initEmployeeInformation(&employee);
     pNode->data = employee;
     pNode->pNext = NULL;
@@ -209,9 +262,16 @@ bool isEmpty(singeList &employeeList)
     return employeeList.pHead == NULL;
 }
 
-void addNewEmployee(singeList &employeeList, employee employee)
+void addNewEmployee(singeList &employeeList, employee newEmployee)
 {
-    node *new_node = creatNewNode(employee);
+	node *new_node;
+    do
+    {
+        new_node = creatNewNode(newEmployee);
+        if (new_node->data.employee_id != 0 && isDuplicateID(employeeList, new_node->data.employee_id))
+            printf("\nError: Duplicate employee ID!");
+    } while (new_node->data.employee_id != 0 && isDuplicateID(employeeList, new_node->data.employee_id));
+
     if(isEmpty(employeeList))
         employeeList.pHead = employeeList.pTail = new_node;
     else
@@ -219,13 +279,39 @@ void addNewEmployee(singeList &employeeList, employee employee)
         employeeList.pTail->pNext = new_node;
         employeeList.pTail = new_node;
     }
+    printf("\nStatus: Successfully added new employee !");
 }
 
 void addNewEmployeeList(singeList &employeeList, employee employee)
 {
-    int quantity; scanf("%d", &quantity);
+    int quantity; 
+    do
+    {
+        printf("\nEnter the number of employees: "); scanf("%d", &quantity); getchar();
+        if(quantity <= 0)
+            printf("\nError: Number of employees cannot be negative !");
+    } while (quantity <= 0);
+    
     while(quantity--)
         addNewEmployee(employeeList, employee);
+    printf("\nStatus: Added employee list successfully !");
+}
+
+void addNewEmployeeListToFile(singeList &employeeList, employee employee)
+{
+    node *newNode = (node*)malloc(sizeof(node));
+    newNode->data = employee;
+    newNode->pNext = NULL;
+
+    if (employeeList.pHead == NULL)
+        employeeList.pHead = newNode;
+    else
+    {
+        node *currentNode = employeeList.pHead;
+        while (currentNode->pNext != NULL)
+            currentNode = currentNode->pNext;
+        currentNode->pNext = newNode;
+    }
 }
 
 void displayEmployeeList(singeList &employeeList)
@@ -250,19 +336,67 @@ void displayEmployeeList(singeList &employeeList)
     }
 }
 
-bool checkEmployeePhoneNumber(employee &employee, int index_number)
+bool checkEmployeePhoneNumber(const employee employee)
 {
-    int ascii_value = (int)employee.employee_phoneNumber[index_number];
-    if(ascii_value < 48 || ascii_value > 57)
+    if (strlen(employee.employee_phoneNumber) != 10) {
         return false;
+    }
+
+    if (employee.employee_phoneNumber[0] != '0') {
+        return false;
+    }
+
+    for (int i = 1; i < 10; i++)
+        if (employee.employee_phoneNumber[i] < '0' || employee.employee_phoneNumber[i] > '9')
+            return false;
+
     return true;
 }
 
 bool checkEmployeeAge(employee &employee)
 {
     if(employee.employee_age > 65 || employee.employee_age < 18)
-        return false;
-    return true;
+        return true;
+    return false;
+}
+
+bool isDuplicateID(const singeList &employeeList, int id)
+{
+    const node *current_node = employeeList.pHead;
+    while(current_node != NULL)
+    {
+        if(current_node->data.employee_id == id)
+            return true;
+        current_node = current_node->pNext;
+    }
+    return false;
+}
+
+void deleteNodeData(singeList &employeeList, employee employee) 
+{
+    node *current = employeeList.pHead;
+    node *previous = NULL;
+
+    while (current != NULL) 
+    {
+        if (current->data.employee_id == employee.employee_id)  
+            break;
+        previous = current;
+        current = current->pNext;
+    }
+
+    if (current == NULL) 
+    {
+        printf("\nStatus: No employee data to be deleted found !");
+        return;
+    }
+
+    if (previous == NULL) 
+        employeeList.pHead = current->pNext;
+    else 
+        previous->pNext = current->pNext;
+
+    free(current);
 }
 
 void readEmployeeListFromFile(singeList &employeeList)
@@ -284,7 +418,12 @@ void readEmployeeListFromFile(singeList &employeeList)
                 employee_replacement.employee_address,
                 employee_replacement.employee_phoneNumber,
                 &employee_replacement.num_products_made) == 7)
-        addNewEmployee(employeeList, employee_replacement);
+                {
+                    printf("\nStatus: Loading employee data !\n\n");
+                    addNewEmployeeListToFile(employeeList, employee_replacement);
+                    displayEmployeeList(employeeList);
+                    printf("\nStatus: Upload data successfully !\n");
+                }
 
     fclose(inputFile);
 }
@@ -304,7 +443,7 @@ void saveEmployeeList(const singeList &employeeList)
         const node *current_node = employeeList.pHead;
         while (current_node != NULL)
         {
-            fprintf(output_file, "%d, %[^,], %d, %[^,], %[^,], %[^,], %d\n",
+            fprintf(output_file, "%d, %s, %d, %s, %s, %s, %d\n",
                 current_node->data.employee_id,
                 current_node->data.employee_name,
                 current_node->data.employee_age,
@@ -312,6 +451,7 @@ void saveEmployeeList(const singeList &employeeList)
                 current_node->data.employee_address,
                 current_node->data.employee_phoneNumber,
                 current_node->data.num_products_made);
+            printf("\n\nStatus: Saved employee successfully !\n");
 
             current_node = current_node->pNext;
         }
@@ -717,6 +857,15 @@ void printMenu()
     printf("+----------+---------------------------------------------------------+\n");
 
     printf("\n======================================================================");
+}
+
+void printStatusMenu()
+{
+    printf("\n\nWarning: Do you want to save the data you just entered into the system ?\n");
+    printf("Warning: If you do not save all entered data, you will be lost !\n");
+    printf("+---------------------------------+----------------------------------+\n");
+    printf(":          [y] Save               :          [n] Don't save          :\n");
+    printf("+---------------------------------+----------------------------------+\n");
 }
 
 char *pop_str_last(char *str) {
