@@ -49,13 +49,16 @@ node *creatNewNode(employee employee);
 void linkInitialization(singeList &employeeList);
 bool isEmpty(singeList &employeeList);
 void addNewEmployee(singeList &employeeList, employee employee);
+void addNewEmployeeList(singeList &employeeList, employee employee);
 void displayEmployeeList(singeList &employeeList);
 bool checkEmployeePhoneNumber(employee &employee, int index_number);
 bool checkEmployeeAge(employee &employee);
+void readEmployeeListFromFile(singeList &employeeList);
+void saveEmployeeList(const singeList &employeeList);
 
-void addNewProduct(product *&productList, int &num_of_product);
-void addNewProductList(product *&productList, int &num_of_product);
-void displayProductList(const product *productList, int num_of_product);
+void addNewProduct(product *&productList, int &num_of_product, singeList &employeeList);
+void addNewProductList(product *&productList, int &num_of_product, singeList &employeeList);
+void displayProductList(const product *productList, int num_of_product, singeList &employeeList);
 void editProductByName(product *productList, int num_of_product);
 void deleteProductByID(product *&productList, int &num_of_product);
 void findMostContributingID(product *productList, int num_of_product);
@@ -76,6 +79,7 @@ int main()
 
     int num_of_employee = 0;
     singeList employeeList; linkInitialization(employeeList);
+    employee employee;
 
     while(1)
     {
@@ -86,15 +90,15 @@ int main()
         switch(choose)
         {
         case 1:
-            addNewProduct(productList, num_of_product);
+            addNewEmployee(employeeList, employee);
             break;
 
         case 2:
-            addNewProductList(productList, num_of_product);
+            addNewEmployeeList(employeeList, employee);
             break;
 
         case 3:
-            displayProductList(productList, num_of_product);
+            displayEmployeeList(employeeList);
             break;
 
         case 4:
@@ -119,7 +123,7 @@ int main()
 
         case 9:
                 readProductListFromFile(productList, num_of_product);
-                displayProductList(productList, num_of_product);
+                displayProductList(productList, num_of_product, employeeList);
             break;
 
         case 10:
@@ -174,6 +178,9 @@ void initEmployeeInformation(employee *employee)
                 printf("\nError: Wrong phone number format !"); 
         } while (checkEmployeePhoneNumber(*employee, i));
     }
+
+    printf("\nNumber of products made: 0");
+    employee->num_products_made = 0;
     getchar();
 }
 
@@ -214,6 +221,13 @@ void addNewEmployee(singeList &employeeList, employee employee)
     }
 }
 
+void addNewEmployeeList(singeList &employeeList, employee employee)
+{
+    int quantity; scanf("%d", &quantity);
+    while(quantity--)
+        addNewEmployee(employeeList, employee);
+}
+
 void displayEmployeeList(singeList &employeeList)
 {
     node *pTmp = employeeList.pHead;
@@ -224,13 +238,14 @@ void displayEmployeeList(singeList &employeeList)
     }
     while(pTmp != NULL)
     {
-        printf("%d, %s, %d, %s, %s, %s\n",
+        printf("%d, %s, %d, %s, %s, %s, %d\n",
             pTmp->data.employee_id, 
             pTmp->data.employee_name, 
             pTmp->data.employee_age, 
             pTmp->data.employee_gender, 
             pTmp->data.employee_address, 
-            pTmp->data.employee_phoneNumber);
+            pTmp->data.employee_phoneNumber,
+            pTmp->data.num_products_made);
         pTmp = pTmp->pNext;
     }
 }
@@ -250,9 +265,69 @@ bool checkEmployeeAge(employee &employee)
     return true;
 }
 
+void readEmployeeListFromFile(singeList &employeeList)
+{
+    FILE *inputFile;
+    do
+    {
+        inputFile = fopen("employee_list.txt", "r");
+        if (inputFile == NULL) 
+            printf("\nError: Could not open file !");
+    } while (inputFile == NULL);
+
+    employee employee_replacement;
+    while (fscanf(inputFile, "%d, %[^,], %d, %[^,], %[^,], %[^,], %d\n",
+                &employee_replacement.employee_id,
+                employee_replacement.employee_name,
+                &employee_replacement.employee_age,
+                employee_replacement.employee_gender,
+                employee_replacement.employee_address,
+                employee_replacement.employee_phoneNumber,
+                &employee_replacement.num_products_made) == 7)
+        addNewEmployee(employeeList, employee_replacement);
+
+    fclose(inputFile);
+}
+
+void saveEmployeeList(const singeList &employeeList)
+{
+    FILE *output_file;
+    do
+    {
+        output_file = fopen("employee_list.txt", "w");
+        if (output_file == NULL) 
+            printf("\nError: Could not open file !");
+    } while (output_file == NULL);
+
+    if(output_file != NULL)
+    {
+        const node *current_node = employeeList.pHead;
+        while (current_node != NULL)
+        {
+            fprintf(output_file, "%d, %[^,], %d, %[^,], %[^,], %[^,], %d\n",
+                current_node->data.employee_id,
+                current_node->data.employee_name,
+                current_node->data.employee_age,
+                current_node->data.employee_gender,
+                current_node->data.employee_address,
+                current_node->data.employee_phoneNumber,
+                current_node->data.num_products_made);
+
+            current_node = current_node->pNext;
+        }
+
+        printf("\nStatus: Product list saved successfully !");
+        fclose(output_file);
+    }
+    else
+    {
+        fprintf(stderr, "\nError: Failed to open the output file !");
+    }
+}
+
 // ------------------------------------------------------------------------------------------------------------------------
 
-void addNewProduct(product *&productList, int &num_of_product)
+void addNewProduct(product *&productList, int &num_of_product, singeList &employeeList)
 {
     num_of_product++;
     product *arr_resizable = (product*)malloc(num_of_product * sizeof(product));
@@ -287,18 +362,40 @@ void addNewProduct(product *&productList, int &num_of_product)
             printf("\nError: Incorrect time format !");
     } while (!checkTime(new_product));
 
+    int employee_in_charge;
+    printf("\nEnter the ID of the employee in charge: ");
+    scanf("%d", &employee_in_charge); getchar();
+
+    bool mark = false;
+    node *current = employeeList.pHead;
+    while (current != NULL)
+    {
+        if(current->data.employee_id == employee_in_charge)
+        {
+            current->data.num_products_made++;
+            new_product.employee = &(current->data);
+            mark = true;
+            break;
+        }
+        current = current->pNext;
+    }
+    if(mark)
+        printf("\nStatus: The employee's ID has been successfully added !");
+    else
+        printf("\nError: Employee ID not found !");
+
     arr_resizable[num_of_product - 1] = new_product;
 }
 
-void addNewProductList(product *&productList, int &num_of_product)
+void addNewProductList(product *&productList, int &num_of_product, singeList &employeeList)
 {
-    unsigned int quantity; scanf("%d", &quantity);
+    int quantity; scanf("%d", &quantity);
     int newSize = num_of_product + quantity;
     for(int i = num_of_product; i < newSize; i++)
-        addNewProduct(productList, num_of_product);
+        addNewProduct(productList, num_of_product, employeeList);
 }
 
-void displayProductList(const product *productList, int num_of_product)
+void displayProductList(const product *productList, int num_of_product, singeList &employeeList)
 {
     if(num_of_product == 0)
         printf("Error: Product list information does not exist !\n");
@@ -306,11 +403,24 @@ void displayProductList(const product *productList, int num_of_product)
     {
         for(int i = 0; i < num_of_product; i++)
         {
-            printf("%d, %s, %.2lf, %d/%d/%d\n",
+            node *current = employeeList.pHead;
+            int employee_in_charge;
+            while (current != NULL)
+            {
+                if(&(current->data) == (*(productList + i)).employee)
+                {
+                    employee_in_charge = current->data.employee_id;
+                    break;
+                }
+                current = current->pNext;
+            }
+
+            printf("%d, %s, %.2lf, %d/%d/%d, %d\n",
                 (*(productList + i)).product_id, 
                 (*(productList + i)).product_name, 
                 (*(productList + i)).product_price, 
-                (*(productList + i)).product_time.day, (*(productList + i)).product_time.month, (*(productList + i)).product_time.year);
+                (*(productList + i)).product_time.day, (*(productList + i)).product_time.month, (*(productList + i)).product_time.year),
+                employee_in_charge;
         }
     }
 }
@@ -527,7 +637,7 @@ void readProductListFromFile(product *&productList, int &num_of_product)
 
 void saveProductList(const product *productList, int num_of_product)
 {
-    FILE *output_file = fopen("product_list.txt", "a");
+    FILE *output_file = fopen("product_list.txt", "w");
 
     if(output_file != NULL)
     {
@@ -577,17 +687,17 @@ int checkPrice(const product &product)
 void printMenu()
 {
     printf("\n======================================================================\n");
-    printf("==================*** PRODUCT MANAGEMENT PROGRAM ***==================\n");
+    printf("===================*** FACTORY MANAGEMENT PROGRAM ***===================\n");
     printf("======================================================================\n\n");
 
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   S No.  : FUNCTION                                                :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   1st    : Create a new product                                    :\n");
+    printf(":   1st    : Create a new employee                                   :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   2nd    : Create a new product list                               :\n");
+    printf(":   2nd    : Create a new employee list                              :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   3rd    : Displays a list of products                             :\n");
+    printf(":   3rd    : Displays a list of employees                            :\n");
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   4th    : Update product information by product name              :\n"); 
     printf("+----------+---------------------------------------------------------+\n");
