@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_PRODUCT 100
 #define NAME_LENGTH 100
 
 struct product_time
@@ -176,145 +175,162 @@ int main()
             {
                 printMenu_Product();
                 int choose_product;
-                printf("\nPlease enter your choice: "); scanf("%d", &choose_product);
-
-                if(choose_product == 1)
+                do
                 {
-                    readProductListFromFile(productList, num_of_product, employeeList);
-                    addNewProduct(productList, num_of_product, employeeList);
-
-                    char choose_case_1;
-                    int check_choose_case_1;
-                    do
+                    printf("\nPlease enter your choice: "); scanf("%d", &choose_product);
+                    if(choose_product == 1)
                     {
-                        printStatusMenu();
-                        printf("Please enter your choice: "); scanf("%c", &choose_case_1);
-                        check_choose_case_1 = (int)choose_case_1;
-                        if(check_choose_case_1 != 121 && check_choose_case_1 != 89 && check_choose_case_1 != 110 && check_choose_case_1 != 78)
-                            printf("\nError: Invalid selection !");
-                    } while (check_choose_case_1 != 121 && check_choose_case_1 != 89 && check_choose_case_1 != 110 && check_choose_case_1 != 78);
+                        readProductListFromFile(productList, num_of_product, employeeList);
+                        addNewProduct(productList, num_of_product, employeeList);
 
-                    if(check_choose_case_1 == 121 || check_choose_case_1 == 89)
-                    {
-                        saveEmployeeList(employeeList);
-                        saveProductList(productList, num_of_product);
-                    }
-                    else if(check_choose_case_1 == 110 || check_choose_case_1 == 78)
-                    {
-                        saveEmployeeList(employeeList); // chua fix
-                    }
+                        char choose_case_1;
+                        int check_choose_case_1;
+                        do
+                        {
+                            printStatusMenu();
+                            printf("Please enter your choice: "); scanf("%c", &choose_case_1);
+                            check_choose_case_1 = (int)choose_case_1;
+                            if(check_choose_case_1 != 121 && check_choose_case_1 != 89 && check_choose_case_1 != 110 && check_choose_case_1 != 78)
+                                printf("\nError: Invalid selection !");
+                        } while (check_choose_case_1 != 121 && check_choose_case_1 != 89 && check_choose_case_1 != 110 && check_choose_case_1 != 78);
 
-                    deleteProductList(productList, num_of_employee);
-                    deleteLinkedList(employeeList);
-                }
+                        if(check_choose_case_1 == 121 || check_choose_case_1 == 89)
+                        {
+                            saveEmployeeList(employeeList);
+                            saveProductList(productList, num_of_product);
+                        }
+                        else if(check_choose_case_1 == 110 || check_choose_case_1 == 78)
+                        {
+                            saveEmployeeList(employeeList); // chua fix
+                        }
 
-                else if(choose_product == 2)
-                {
-                    readProductListFromFile(productList, num_of_product, employeeList);
-                    addNewProductList(productList, num_of_product, employeeList);
-
-                    char choose_case_2;
-                    int check_choose_case_2;
-                    do
-                    {
-                        printStatusMenu();
-                        printf("Please enter your choice: "); scanf("%c", &choose_case_2);
-                        check_choose_case_2 = (int)choose_case_2;
-                        if(check_choose_case_2 != 121 && check_choose_case_2 != 89 && check_choose_case_2 != 110 && check_choose_case_2 != 78)
-                            printf("\nError: Invalid selection !");
-                    } while (check_choose_case_2 != 121 && check_choose_case_2 != 89 && check_choose_case_2 != 110 && check_choose_case_2 != 78);
-
-                    if(check_choose_case_2 == 121 || check_choose_case_2 == 89)
-                    {
-                        saveEmployeeList(employeeList);
-                        saveProductList(productList, num_of_product);
-                    }
-                    else if(check_choose_case_2 == 110 || check_choose_case_2 == 78)
-                    {
-                        saveEmployeeList(employeeList); // chua fix
+                        deleteProductList(productList, num_of_employee);
+                        deleteLinkedList(employeeList);
+                        printMenu_Product();
                     }
 
-                    deleteProductList(productList, num_of_employee);
-                    deleteLinkedList(employeeList);
-                }
-
-                else if(choose_product == 3)
-                {
-                    readProductListFromFile(productList, num_of_product, employeeList);
-                    displayProductList(productList, num_of_product, employeeList);
-                    deleteProductList(productList, num_of_product);
-                    deleteLinkedList(employeeList);
-                }
-
-                else if(choose_product == 4)
-                {
-                    readProductListFromFile(productList, num_of_product, employeeList);
-                    deleteProductByID(productList, num_of_product, employeeList);
-
-                    char choose_case_4;
-                    int check_choose_case_4;
-                    do
+                    else if(choose_product == 2)
                     {
-                        printStatusMenu();
-                        printf("Please enter your choice: "); scanf("%c", &choose_case_4);
-                        check_choose_case_4 = (int)choose_case_4;
-                        if(check_choose_case_4 != 121 && check_choose_case_4 != 89 && check_choose_case_4 != 110 && check_choose_case_4 != 78)
-                            printf("\nError: Invalid selection !");
-                    } while (check_choose_case_4 != 121 && check_choose_case_4 != 89 && check_choose_case_4 != 110 && check_choose_case_4 != 78);
+                        readProductListFromFile(productList, num_of_product, employeeList);
+                        addNewProductList(productList, num_of_product, employeeList);
 
-                    if(check_choose_case_4 == 121 || check_choose_case_4 == 89)
-                    {
-                        saveEmployeeList(employeeList);
-                        saveProductList(productList, num_of_product);
-                    }
-                    else if(check_choose_case_4 == 110 || check_choose_case_4 == 78)
-                    {
-                        saveEmployeeList(employeeList); // chua fix
+                        char choose_case_2;
+                        int check_choose_case_2;
+                        do
+                        {
+                            printStatusMenu();
+                            printf("Please enter your choice: "); scanf("%c", &choose_case_2);
+                            check_choose_case_2 = (int)choose_case_2;
+                            if(check_choose_case_2 != 121 && check_choose_case_2 != 89 && check_choose_case_2 != 110 && check_choose_case_2 != 78)
+                                printf("\nError: Invalid selection !");
+                        } while (check_choose_case_2 != 121 && check_choose_case_2 != 89 && check_choose_case_2 != 110 && check_choose_case_2 != 78);
+
+                        if(check_choose_case_2 == 121 || check_choose_case_2 == 89)
+                        {
+                            saveEmployeeList(employeeList);
+                            saveProductList(productList, num_of_product);
+                        }
+                        else if(check_choose_case_2 == 110 || check_choose_case_2 == 78)
+                        {
+                            saveEmployeeList(employeeList); // chua fix
+                        }
+
+                        deleteProductList(productList, num_of_employee);
+                        deleteLinkedList(employeeList);
+                        printMenu_Product();
                     }
 
-                    deleteProductList(productList, num_of_employee);
-                    deleteLinkedList(employeeList);
-                }
-
-                else if(choose_product == 5)
-                {
-                    readProductListFromFile(productList, num_of_product, employeeList);
-                    editProductByName(productList, num_of_product);
-
-                    char choose_case_5;
-                    int check_choose_case_5;
-                    do
+                    else if(choose_product == 3)
                     {
-                        printStatusMenu();
-                        printf("Please enter your choice: "); scanf("%c", &choose_case_5);
-                        check_choose_case_5 = (int)choose_case_5;
-                        if(check_choose_case_5 != 121 && check_choose_case_5 != 89 && check_choose_case_5 != 110 && check_choose_case_5 != 78)
-                            printf("\nError: Invalid selection !");
-                    } while (check_choose_case_5 != 121 && check_choose_case_5 != 89 && check_choose_case_5 != 110 && check_choose_case_5 != 78);
-
-                    if(check_choose_case_5 == 121 || check_choose_case_5 == 89)
-                    {
-                        saveEmployeeList(employeeList);
-                        saveProductList(productList, num_of_product);
-                    }
-                    else if(check_choose_case_5 == 110 || check_choose_case_5 == 78)
-                    {
-                        saveEmployeeList(employeeList); 
+                        readProductListFromFile(productList, num_of_product, employeeList);
+                        displayProductList(productList, num_of_product, employeeList);
+                        deleteProductList(productList, num_of_product);
+                        deleteLinkedList(employeeList);
+                        printMenu_Product();
                     }
 
-                    deleteProductList(productList, num_of_employee);
-                    deleteLinkedList(employeeList);
-                }
+                    else if(choose_product == 4)
+                    {
+                        readProductListFromFile(productList, num_of_product, employeeList);
+                        deleteProductByID(productList, num_of_product, employeeList);
 
-                else if(choose_product == 6)
-                {
-                    readProductListFromFile(productList, num_of_product, employeeList);
-                    sortProductsByPrice(productList, num_of_product);
-                    displayProductList(productList, num_of_product, employeeList);
-                    deleteProductList(productList, num_of_product);
-                    deleteLinkedList(employeeList);
-                }
+                        char choose_case_4;
+                        int check_choose_case_4;
+                        do
+                        {
+                            printStatusMenu();
+                            printf("Please enter your choice: "); scanf("%c", &choose_case_4);
+                            check_choose_case_4 = (int)choose_case_4;
+                            if(check_choose_case_4 != 121 && check_choose_case_4 != 89 && check_choose_case_4 != 110 && check_choose_case_4 != 78)
+                                printf("\nError: Invalid selection !");
+                        } while (check_choose_case_4 != 121 && check_choose_case_4 != 89 && check_choose_case_4 != 110 && check_choose_case_4 != 78);
 
+                        if(check_choose_case_4 == 121 || check_choose_case_4 == 89)
+                        {
+                            saveEmployeeList(employeeList);
+                            saveProductList(productList, num_of_product);
+                        }
+                        else if(check_choose_case_4 == 110 || check_choose_case_4 == 78)
+                        {
+                            saveEmployeeList(employeeList); // chua fix
+                        }
+
+                        deleteProductList(productList, num_of_employee);
+                        deleteLinkedList(employeeList);
+                        printMenu_Product();
+                    }
+
+                    else if(choose_product == 5)
+                    {
+                        readProductListFromFile(productList, num_of_product, employeeList);
+                        editProductByName(productList, num_of_product);
+
+                        char choose_case_5;
+                        int check_choose_case_5;
+                        do
+                        {
+                            printStatusMenu();
+                            printf("Please enter your choice: "); scanf("%c", &choose_case_5);
+                            check_choose_case_5 = (int)choose_case_5;
+                            if(check_choose_case_5 != 121 && check_choose_case_5 != 89 && check_choose_case_5 != 110 && check_choose_case_5 != 78)
+                                printf("\nError: Invalid selection !");
+                        } while (check_choose_case_5 != 121 && check_choose_case_5 != 89 && check_choose_case_5 != 110 && check_choose_case_5 != 78);
+
+                        if(check_choose_case_5 == 121 || check_choose_case_5 == 89)
+                        {
+                            saveEmployeeList(employeeList);
+                            saveProductList(productList, num_of_product);
+                        }
+                        else if(check_choose_case_5 == 110 || check_choose_case_5 == 78)
+                        {
+                            saveEmployeeList(employeeList); 
+                        }
+
+                        deleteProductList(productList, num_of_employee);
+                        deleteLinkedList(employeeList);
+                        printMenu_Product();
+                    }
+
+                    else if(choose_product == 6)
+                    {
+                        readProductListFromFile(productList, num_of_product, employeeList);
+                        sortProductsByPrice(productList, num_of_product);
+                        displayProductList(productList, num_of_product, employeeList);
+                        deleteProductList(productList, num_of_product);
+                        deleteLinkedList(employeeList);
+                        printMenu_Product();
+                    }
+
+                    else if(choose_product == 0)
+                        break;
+
+                    else
+                    {
+                        printf("\nError: Invalid selection !");
+                        printMenu_Product();
+                    }
+                } while (choose_product != 1 || choose_product != 2 || choose_product != 3 || choose_product != 4 || choose_product != 5 || choose_product != 6 || choose_product == 0);
+                
                 break;
             }
 
@@ -622,6 +638,7 @@ void readEmployeeListFromFile(singeList &employeeList)
                     printf("\nStatus: Upload data successfully !\n");
                 }
     printf("\n");
+    system("cls");
     displayEmployeeList(employeeList);
 
     rewind(inputFile);
@@ -1082,9 +1099,9 @@ int checkPrice(const product &product)
 
 void printMenu_Employee()
 {
-    printf("\n======================================================================\n");
+    printf("\n\n======================================================================\n");
     printf("==================*** EMPLOYEE MANAGEMENT PROGRAM ***=================\n");
-    printf("======================================================================\n\n");
+    printf("======================================================================\n");
 
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   S No.  : FUNCTION                                                :\n");
@@ -1107,9 +1124,9 @@ void printMenu_Employee()
 
 void printMenu_Product()
 {
-    printf("\n======================================================================\n");
+    printf("\n\n======================================================================\n");
     printf("===================*** PRODUCT MANAGEMENT PROGRAM ***==================\n");
-    printf("======================================================================\n\n");
+    printf("======================================================================\n");
 
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   S No.  : FUNCTION                                                :\n");
