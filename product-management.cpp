@@ -53,6 +53,8 @@ void addNewEmployee(singeList &employeeList, employee newEmployee);
 void addNewEmployeeList(singeList &employeeList, employee employee);
 void addNewEmployeeListToFile(singeList &employeeList, employee newEmployee);
 void displayEmployeeList(singeList &employeeList);
+void sortEmployeesByProductCount(singeList &employeeList);
+void swapDataNode(node *node_1, node *node_2);
 bool checkEmployeePhoneNumber(const employee employee);
 bool checkEmployeeAge(employee &employee);
 bool isDuplicateID(const singeList &employeeList, int id);
@@ -66,11 +68,10 @@ void addNewProductList(product *&productList, int &num_of_product, singeList &em
 void addNewProductToFile(product *&productList, int &num_of_product, product *newProduct);
 void displayProductList(const product *productList, int num_of_product, singeList &employeeList);
 void editProductByName(product *productList, int num_of_product);
-void deleteProductByID(product *&productList, int &num_of_product);
+void deleteProductByID(product *&productList, int &num_of_product, singeList &employeeList);
 void deleteProductList(struct product *&productList, int &num_of_product);
 void findMostContributingID(product *productList, int num_of_product);
 void sortProductsByPrice(product *productList, int num_of_product);
-void addProductToFile(const char* filename, product *productList, int &num_of_product);
 void readProductListFromFile(product *&productList, int &num_of_product, singeList &employeeList);
 void saveProductList(const product *productList, int num_of_product);
 bool checkTime(const product &product);
@@ -245,6 +246,84 @@ int main()
                     deleteLinkedList(employeeList);
                 }
 
+                else if(choose_product == 4)
+                {
+                    readProductListFromFile(productList, num_of_product, employeeList);
+                    deleteProductByID(productList, num_of_product, employeeList);
+
+                    char choose_case_4;
+                    int check_choose_case_4;
+                    do
+                    {
+                        printStatusMenu();
+                        printf("Please enter your choice: "); scanf("%c", &choose_case_4);
+                        check_choose_case_4 = (int)choose_case_4;
+                        if(check_choose_case_4 != 121 && check_choose_case_4 != 89 && check_choose_case_4 != 110 && check_choose_case_4 != 78)
+                            printf("\nError: Invalid selection !");
+                    } while (check_choose_case_4 != 121 && check_choose_case_4 != 89 && check_choose_case_4 != 110 && check_choose_case_4 != 78);
+
+                    if(check_choose_case_4 == 121 || check_choose_case_4 == 89)
+                    {
+                        saveEmployeeList(employeeList);
+                        saveProductList(productList, num_of_product);
+                    }
+                    else if(check_choose_case_4 == 110 || check_choose_case_4 == 78)
+                    {
+                        saveEmployeeList(employeeList); // chua fix
+                    }
+
+                    deleteProductList(productList, num_of_employee);
+                    deleteLinkedList(employeeList);
+                }
+
+                else if(choose_product == 5)
+                {
+                    readProductListFromFile(productList, num_of_product, employeeList);
+                    editProductByName(productList, num_of_product);
+
+                    char choose_case_5;
+                    int check_choose_case_5;
+                    do
+                    {
+                        printStatusMenu();
+                        printf("Please enter your choice: "); scanf("%c", &choose_case_5);
+                        check_choose_case_5 = (int)choose_case_5;
+                        if(check_choose_case_5 != 121 && check_choose_case_5 != 89 && check_choose_case_5 != 110 && check_choose_case_5 != 78)
+                            printf("\nError: Invalid selection !");
+                    } while (check_choose_case_5 != 121 && check_choose_case_5 != 89 && check_choose_case_5 != 110 && check_choose_case_5 != 78);
+
+                    if(check_choose_case_5 == 121 || check_choose_case_5 == 89)
+                    {
+                        saveEmployeeList(employeeList);
+                        saveProductList(productList, num_of_product);
+                    }
+                    else if(check_choose_case_5 == 110 || check_choose_case_5 == 78)
+                    {
+                        saveEmployeeList(employeeList); 
+                    }
+
+                    deleteProductList(productList, num_of_employee);
+                    deleteLinkedList(employeeList);
+                }
+
+                else if(choose_product == 6)
+                {
+                    readProductListFromFile(productList, num_of_product, employeeList);
+                    sortProductsByPrice(productList, num_of_product);
+                    displayProductList(productList, num_of_product, employeeList);
+                    deleteProductList(productList, num_of_product);
+                    deleteLinkedList(employeeList);
+                }
+
+                break;
+            }
+
+        case 5:
+            {
+                readEmployeeListFromFile(employeeList);
+                sortEmployeesByProductCount(employeeList);
+                displayEmployeeList(employeeList);
+                deleteLinkedList(employeeList);
                 break;
             }
 
@@ -405,6 +484,41 @@ void displayEmployeeList(singeList &employeeList)
         pTmp = pTmp->pNext;
     }
     printf("\nStatus: Display list of employees successfully !\n");
+}
+
+void sortEmployeesByProductCount(singeList &employeeList)
+{
+    if(employeeList.pHead->pNext == NULL || isEmpty(employeeList))
+    {
+        return;
+    }
+
+    bool swapped;
+    node *current;
+    node *temp = NULL;
+
+    do 
+    {
+        swapped = false;
+        current = employeeList.pHead;
+
+        while (current->pNext != temp) {
+            if (current->data.num_products_made < current->pNext->data.num_products_made) 
+            {
+                swapDataNode(current, current->pNext);
+                swapped = true;
+            }
+            current = current->pNext;
+        }
+        temp = current;
+    } while (swapped);
+}
+
+void swapDataNode(node *node_1, node *node_2)
+{
+    employee temp = node_1->data;
+    node_1->data = node_2->data;
+    node_2->data = temp;
 }
 
 bool checkEmployeePhoneNumber(const employee employee)
@@ -683,26 +797,35 @@ void displayProductList(const product *productList, int num_of_product, singeLis
 void editProductByName(product *productList, int num_of_product)
 {
     bool marker = false;
+    bool check = true;
     int index_alternative_product;
-    char alternative_product_name[MAX_PRODUCT];
+    char alternative_product_name[NAME_LENGTH];
 
-    printf("\nEnter the name of the alternative Product: "); getchar();
-    fgets(alternative_product_name, sizeof(alternative_product_name) + 1, stdin);
-
-    for(int index_product = 0; index_product < num_of_product; index_product++)
+    do
     {
-        int result = strcmp(alternative_product_name, (productList[index_product].product_name));
-        if(result != 0)
+        printf("\nEnter the name of the alternative product: "); getchar();
+        fgets(alternative_product_name, sizeof(alternative_product_name) + 1, stdin); pop_str_last(alternative_product_name);
+
+        for(int index_product = 0; index_product < num_of_product; index_product++)
         {
-            printf("\nError: The requested product name was not found !");
-            break;
+            int result = strcmp(alternative_product_name, (productList[index_product].product_name));
+            if(result != 0)
+            {
+                if(index_product == (num_of_product - 1))
+                    printf("\nError: The requested product name was not found !");
+            }
+            else
+            {
+                marker = true;
+                check = false;
+                index_alternative_product = index_product;
+                break;
+            }
         }
-        else
-        {
-            marker = true;
-            index_alternative_product = index_product;
-        }
-    }
+        if(check)
+            printf("\nError: No valid product name found !");
+    } while (check);
+    
 
     if(marker)
     {
@@ -712,15 +835,7 @@ void editProductByName(product *productList, int num_of_product)
         scanf("%d", &alternative_product.product_id); getchar();
 
         printf("\nEnter the name of the Product: "); 
-        fgets(alternative_product.product_name, sizeof(alternative_product.product_name) + 1, stdin);
-
-        do
-        {
-            printf("\nEnter the Product's manuafacturing date: ");
-            scanf("%d%d%d", &alternative_product.product_time.day, &alternative_product.product_time.month, &alternative_product.product_time.year);
-            if(!checkTime(alternative_product))
-                printf("\nError: Incorrect time format !");
-        } while (!checkTime(alternative_product));
+        fgets(alternative_product.product_name, sizeof(alternative_product.product_name) + 1, stdin); pop_str_last(alternative_product.product_name);
 
         do
         {
@@ -728,28 +843,53 @@ void editProductByName(product *productList, int num_of_product)
             scanf("%lf", &alternative_product.product_price); getchar();
             if(!checkPrice(alternative_product))
                 printf("\nError: The product's price is a non-negative number !");
-        }   while (!checkPrice(alternative_product)); 
+        }   while (!checkPrice(alternative_product));
+
+        do
+        {
+            printf("\nEnter the Product's manuafacturing date: ");
+            scanf("%d%d%d", &alternative_product.product_time.day, &alternative_product.product_time.month, &alternative_product.product_time.year);
+            if(!checkTime(alternative_product))
+                printf("\nError: Incorrect time format !");
+        } while (!checkTime(alternative_product)); 
+
+        alternative_product.employee = (*(productList + index_alternative_product)).employee;
 
         *(productList + index_alternative_product) = alternative_product;
     }
 }
 
-void deleteProductByID(product *&productList, int &num_of_product)
+void deleteProductByID(product *&productList, int &num_of_product, singeList &employeeList)
 {
-    int ID_location_of_product_deleted;
-    printf("\nEnter the ID of the product to delete: ");
-    scanf("%d", &ID_location_of_product_deleted); getchar();
+    int ID_of_product_deleted;
+    do
+    {
+        printf("\nEnter the ID of the product to delete: "); scanf("%d", &ID_of_product_deleted); getchar();
+        if(ID_of_product_deleted <= 0)
+            printf("\nError: ID of products cannot be negative !");
+        
+    } while (ID_of_product_deleted <= 0);
 
-    if(ID_location_of_product_deleted != productList->product_id)
+
+    bool mark = false;
+    int index_product_delete;
+    for(index_product_delete = 0; index_product_delete < num_of_product; index_product_delete++)
+    {
+        if(ID_of_product_deleted == productList[index_product_delete].product_id)
+        {
+            mark = true;
+            productList[index_product_delete].employee->num_products_made--;
+            for(index_product_delete; index_product_delete < num_of_product; index_product_delete++)
+            {
+                    *(productList + index_product_delete) = *(productList + (index_product_delete + 1));
+            }
+            num_of_product--;
+            break;
+        }
+    }
+    if(mark == false)
     {
         printf("\nError: Cannot find product ID to delete !");
-    }
-    else
-    {
-        for(int index_product = ID_location_of_product_deleted - 1; index_product < num_of_product; index_product++)
-        *(productList + index_product) = *(productList + (index_product + 1));
-
-        num_of_product--;
     }
 }
 
@@ -760,7 +900,6 @@ void deleteProductList(struct product *&productList, int &num_of_product)
         delete[] productList;
         productList = NULL;
         num_of_product = 0;
-        printf("\nStatus: Successfully deleted the product array !");
     }
     else
     {
@@ -842,28 +981,6 @@ void sortProductsByPrice(product *productList, int num_of_product)
         }
     }
 }
-
-/*void addProductToFile(const char *filename, product *&productList, int &num_of_product)
-{
-    FILE *inputFile = fopen(filename, "a");
-    if (inputFile == NULL) 
-    {
-        printf("\nError: Could not open file !");
-        return;
-    }
-
-    addNewProduct(productList, num_of_product);
-
-    fprintf(inputFile, "%d, %s, %d, %d, %d, %d\n", 
-        productList->product_id, 
-        productList->product_name,
-        productList->product_price, 
-        productList->product_time.day, 
-        productList->product_time.month, 
-        productList->product_time.year);
-
-    fclose(inputFile);
-}*/
 
 void readProductListFromFile(product *&productList, int &num_of_product, singeList &employeeList)
 {
@@ -980,6 +1097,8 @@ void printMenu_Employee()
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   4rd    : PRODUCT MANAGEMENT PROGRAM                              :\n");
     printf("+----------+---------------------------------------------------------+\n");
+    printf(":   5rd    : Arrange employees based on the number of products create:\n");
+    printf("+----------+---------------------------------------------------------+\n");
     printf(":    0     : Exit the program                                        :\n");
     printf("+----------+---------------------------------------------------------+\n");
 
@@ -1001,11 +1120,11 @@ void printMenu_Product()
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   3rd    : Displays a list of products                             :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   4rd    : Delete the product by ID                                :\n");
+    printf(":   4rd    : Delete the product by ID product                        :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   5rd    : Update product information                              :\n");
+    printf(":   5rd    : Edit product information by name product                :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   6rd    : Sort Products By Price                                  :\n");
+    printf(":   6rd    : Sort products by price product                          :\n");
     printf("+----------+---------------------------------------------------------+\n");
     printf(":    0     : Exit the program                                        :\n");
     printf("+----------+---------------------------------------------------------+\n");
