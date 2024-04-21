@@ -57,7 +57,7 @@ void swapDataNode(node *node_1, node *node_2);
 bool checkEmployeePhoneNumber(const employee employee);
 bool checkEmployeeAge(employee &employee);
 bool isDuplicateID(const singeList &employeeList, int id);
-void deleteNodeDataByID(singeList &employeeList, employee employee);
+void deleteNodeDataByID(singeList &employeeList, employee *employee);
 void deleteLinkedList(singeList &employeeList);
 void readEmployeeListFromFile(singeList &employeeList);
 void saveEmployeeList(const singeList &employeeList);
@@ -119,7 +119,7 @@ int main()
                     saveEmployeeList(employeeList);
                 else if(check_choose_case_1 == 110 || check_choose_case_1 == 78)
                 {
-                    deleteNodeDataByID(employeeList, employee_case_1);
+                    deleteNodeDataByID(employeeList, &(employeeList.pHead->data));
                     saveEmployeeList(employeeList);
                 }
 
@@ -573,14 +573,14 @@ bool isDuplicateID(const singeList &employeeList, int id)
     return false;
 }
 
-void deleteNodeDataByID(singeList &employeeList, employee employee) 
+void deleteNodeDataByID(singeList &employeeList, employee *employee) 
 {
     node *current = employeeList.pHead;
     node *previous = NULL;
 
     while (current != NULL) 
     {
-        if (current->data.employee_id == employee.employee_id)  
+        if (current->data.employee_id == employee->employee_id)  
             break;
         previous = current;
         current = current->pNext;
@@ -597,7 +597,7 @@ void deleteNodeDataByID(singeList &employeeList, employee employee)
     else 
         previous->pNext = current->pNext;
 
-    free(current);
+    delete[] current;
 }
 
 void deleteLinkedList(singeList &employeeList) 
