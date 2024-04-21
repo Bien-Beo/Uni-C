@@ -1,4 +1,4 @@
-123456, Cao Xuan Diep, 21, Nam, Thanh Hoa, 0563564675, 2
-234567, Bui Dinh Hoang, 19, Nam, Kon Tum, 0564376548, 1
-345678, Tran Ngoc Bien, 34, Nam, Dak Nong, 0645923518, 2
-456789, Nguyen Thanh Tri, 30, Nam, Tien Giang, 0951275945, 1
+123456, Cao Xuan Diep, 21, Nam, Thanh Hoa, 0563564675, 3
+234567, Bui Dinh Hoang, 19, Nam, Kon Tum, 0564376548, 1
+345678, Tran Ngoc Bien, 34, Nam, Dak Nong, 0645923518, 3
+456789, Nguyen Thanh Tri, 30, Nam, Tien Giang, 0951275945, 1
