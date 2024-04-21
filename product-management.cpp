@@ -306,11 +306,21 @@ int main()
                         system("cls");
                         sortProductsByPrice(productList, num_of_product);
                         displayProductList(productList, num_of_product, employeeList);
+                        pressAnyKeyToContinue();
+
+                        saveEmployeeList(employeeList);
+                        saveProductList(productList, num_of_product);
 
                         deleteProductList(productList, num_of_product);
                         deleteLinkedList(employeeList);
 
-                        pressAnyKeyToContinue();
+                        readProductListFromFile(productList, num_of_product, employeeList);
+                        system("cls");
+                        displayProductList(productList, num_of_product, employeeList);
+
+                        deleteProductList(productList, num_of_product);
+                        deleteLinkedList(employeeList);
+
                         system("cls");
                         printMenu_Product();
                     }
@@ -330,11 +340,14 @@ int main()
 
         case 5:
             {
-                readEmployeeListFromFile(employeeList); printf("\n\n");
+                readEmployeeListFromFile(employeeList);
                 sortEmployeesByProductCount(employeeList);
+                system("cls");
                 displayEmployeeList(employeeList);
-                deleteLinkedList(employeeList);
+                printf("\nSuccessfully arrange employee !\n");
                 pressAnyKeyToContinue();
+                saveEmployeeList(employeeList);
+                deleteLinkedList(employeeList);
                 system("cls");
                 break;
             }
@@ -343,10 +356,10 @@ int main()
             free(productList);
             return 0;
 
-        choose:
+        //choose:
         default:
-            free(productList);
-            return 0;
+            system("cls");
+            printf("\nWarning: Invalid choice. Please try again !\n");
         }
     }
 }
@@ -1047,9 +1060,9 @@ int checkPrice(const product &product)
 
 void printMenu_Employee()
 {
-    printf("\n\n======================================================================\n");
-    printf("==================*** EMPLOYEE MANAGEMENT PROGRAM ***=================\n");
-    printf("======================================================================\n");
+    printf("                      FACTORY MANAGEMENT PROGRAM                      \n");
+    printf("\nServer: EMPLOYEE");
+    printf("\n==================*** EMPLOYEE MANAGEMENT PROGRAM ***=================\n");
 
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   S No.  : FUNCTION                                                :\n");
@@ -1060,21 +1073,21 @@ void printMenu_Employee()
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   3rd    : Displays a list of employees                            :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":   4rd    : PRODUCT MANAGEMENT PROGRAM                              :\n");
+    printf(":   4rd    : Server switch: PRODUCTS                                 :\n");
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   5rd    : Arrange employees based on the number of products create:\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":    0     : Exit the program                                        :\n");
+    printf(":    0     : Exit server: EMPLOYEE                                   :\n");
     printf("+----------+---------------------------------------------------------+\n");
 
-    printf("\n======================================================================");
+    printf("======================================================================");
 }
 
 void printMenu_Product()
 {
-    printf("\n\n======================================================================\n");
-    printf("===================*** PRODUCT MANAGEMENT PROGRAM ***==================\n");
-    printf("======================================================================\n");
+    printf("                      FACTORY MANAGEMENT PROGRAM                      \n");
+    printf("\nServer: PRODUCTS");
+    printf("\n==================*** PRODUCTS MANAGEMENT PROGRAM ***==================\n");
 
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   S No.  : FUNCTION                                                :\n");
@@ -1091,10 +1104,10 @@ void printMenu_Product()
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   6rd    : Sort products by price product                          :\n");
     printf("+----------+---------------------------------------------------------+\n");
-    printf(":    0     : Exit the program                                        :\n");
+    printf(":    0     : Exit server: PRODUCTS                                   :\n");
     printf("+----------+---------------------------------------------------------+\n");
 
-    printf("\n======================================================================");
+    printf("======================================================================");
 }
 
 void printStatusMenu()
