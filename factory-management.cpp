@@ -735,13 +735,12 @@ void addNewProduct(product *&productList, int &num_of_product, singeList &employ
             printf("\nError: Incorrect time format !");
     } while (!checkTime(new_product));
 
-    int employee_in_charge;
-    printf("\nEnter the ID of the employee in charge: ");
-    scanf("%d", &employee_in_charge); getchar();
-
     bool mark = false; 
     do
     {
+        int employee_in_charge;
+        printf("\nEnter the ID of the employee in charge: ");
+        scanf("%d", &employee_in_charge); getchar();
         node *current = employeeList.pHead;
         while (current != NULL)
         {
@@ -830,18 +829,15 @@ void editProductByName(product *productList, int num_of_product)
 
     do
     {
-        printf("\nEnter the name of the alternative product: "); getchar();
+        printf("\nEnter the name of the alternative product: ");
+        char c;
+         //getchar(); 
         fgets(alternative_product_name, sizeof(alternative_product_name) + 1, stdin); pop_str_last(alternative_product_name);
 
         for(int index_product = 0; index_product < num_of_product; index_product++)
         {
             int result = strcmp(alternative_product_name, (productList[index_product].product_name));
-            if(result != 0)
-            {
-                if(index_product == (num_of_product - 1))
-                    printf("\nError: The requested product name was not found !");
-            }
-            else
+            if(result == 0)
             {
                 marker = true;
                 check = false;
@@ -850,7 +846,10 @@ void editProductByName(product *productList, int num_of_product)
             }
         }
         if(check)
+        {
             printf("\nError: No valid product name found !");
+            while((c = getchar()) != '\n'){}
+        }
     } while (check);
     
 
@@ -1063,7 +1062,6 @@ void printMenu_Employee()
     printf("                      FACTORY MANAGEMENT PROGRAM                      \n");
     printf("\nServer: EMPLOYEE");
     printf("\n==================*** EMPLOYEE MANAGEMENT PROGRAM ***=================\n");
-
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   S No.  : FUNCTION                                                :\n");
     printf("+----------+---------------------------------------------------------+\n");
@@ -1079,7 +1077,6 @@ void printMenu_Employee()
     printf("+----------+---------------------------------------------------------+\n");
     printf(":    0     : Exit server: EMPLOYEE                                   :\n");
     printf("+----------+---------------------------------------------------------+\n");
-
     printf("======================================================================");
 }
 
@@ -1088,7 +1085,6 @@ void printMenu_Product()
     printf("                      FACTORY MANAGEMENT PROGRAM                      \n");
     printf("\nServer: PRODUCTS");
     printf("\n==================*** PRODUCTS MANAGEMENT PROGRAM ***==================\n");
-
     printf("+----------+---------------------------------------------------------+\n");
     printf(":   S No.  : FUNCTION                                                :\n");
     printf("+----------+---------------------------------------------------------+\n");
@@ -1106,7 +1102,6 @@ void printMenu_Product()
     printf("+----------+---------------------------------------------------------+\n");
     printf(":    0     : Exit server: PRODUCTS                                   :\n");
     printf("+----------+---------------------------------------------------------+\n");
-
     printf("======================================================================");
 }
 
