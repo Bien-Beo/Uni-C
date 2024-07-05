@@ -451,7 +451,7 @@ void addNewEmployee(singeList &employeeList, employee newEmployee)
     else
     {
         new_node->pNext = employeeList.pHead;
-        employeeList.pHead = new_node;
+        employeeList.pHead = new_node;  
     }
     printf("\nStatus: Successfully added new employee !\n");
 }
